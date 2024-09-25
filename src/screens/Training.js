@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function Setting() {
+export default function Training() {
   return (
     <View>
-      <Text>Setting</Text>
+      <Text>Training</Text>
     </View>
   )
 }

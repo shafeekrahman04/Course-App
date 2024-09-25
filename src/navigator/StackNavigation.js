@@ -2,8 +2,6 @@ import { StyleSheet } from 'react-native'
 import React, { useEffect } from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
-import Profile from '../screens/Profile';
-import Setting from '../screens/Setting';
 import SpalshScreen from '../screens/SpalshScreen';
 import LoginScreen from '../screens/LoginScreen';
 import BottomTab from './BottomTab';
@@ -39,20 +37,6 @@ export default function StackNavigation() {
                     options={{
                         headerShown: false,
                     }}
-                />
-                <Stack.Screen
-                    name="Profile"
-                    component={Profile}
-                    options={{
-                        title: 'Profile',
-                    }}
-                />
-                <Stack.Screen
-                    name="Setting"
-                    component={Setting}
-                    options={({ navigation }) => ({
-                        title: 'Setting',
-                    })}
                 />
             </Stack.Navigator>
 
