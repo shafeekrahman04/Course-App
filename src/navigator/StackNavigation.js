@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import SpalshScreen from '../screens/SpalshScreen';
 import LoginScreen from '../screens/LoginScreen';
 import BottomTab from './BottomTab';
+import VideoScreen from '../screens/VideoScreen';
 
 
 const Stack = createStackNavigator();
@@ -34,6 +35,13 @@ export default function StackNavigation() {
                 <Stack.Screen
                     name="HomeTab"
                     component={BottomTab}
+                    options={{
+                        headerShown: false,
+                    }}
+                />
+                <Stack.Screen
+                    name="VideoScreen"
+                    component={VideoScreen}
                     options={{
                         headerShown: false,
                     }}
