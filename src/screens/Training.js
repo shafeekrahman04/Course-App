@@ -6,16 +6,12 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
-  StatusBar,
 } from 'react-native';
 import Header from '../shared/Header';
 import * as Progress from 'react-native-progress'; // Import progress bar library
 import {Colors} from '../utilities/styles/GlobalStyles';
-import LinearGradient from 'react-native-linear-gradient';
 
 export default function Training() {
-  const { width: W } = Dimensions.get('window')
 
   return (
     <ScrollView style={styles.container}>
