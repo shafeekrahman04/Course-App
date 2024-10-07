@@ -1,5 +1,6 @@
 import {
   Image,
+  ImageBackground,
   Modal,
   StyleSheet,
   Text,
@@ -35,7 +36,12 @@ export default function LoginScreen({navigation}) {
   };
 
   return (
-    <View style={styles.body}>
+    <ImageBackground
+      source={require('../../assets/logo/bgg.png')}
+      resizeMode='cover'
+      blurRadius={1}
+      style={styles.body}>
+        <View style={styles.overlay}/>
       <View style={styles.image_container}>
         <Image
           source={require('../../assets/logo/logo.png')}
@@ -49,8 +55,8 @@ export default function LoginScreen({navigation}) {
         <View style={styles.input_container}>
           <View style={{paddingBottom: 20, paddingTop: 10}}>
             <TextInput
-              style={[GlobalStyles.input_filed]}
-              placeholderTextColor={Colors.grey}
+              style={[styles.input_filed]}
+              placeholderTextColor={'grey'}
               placeholder="Mobile Number"
               maxLength={10}
               keyboardType="phone-pad"
@@ -60,10 +66,10 @@ export default function LoginScreen({navigation}) {
               }}
             />
           </View>
-          <View style={[GlobalStyles.input_filed, styles.password_field]}>
+          <View style={[ styles.password_field]}>
             <TextInput
-              style={{width: '90%', color: Colors.black}}
-              placeholderTextColor={Colors.grey}
+              style={{width: '90%', color: 'grey'}}
+              placeholderTextColor={'grey'}
               secureTextEntry={showPassword}
               placeholder="Password"
               value={password}
@@ -76,10 +82,10 @@ export default function LoginScreen({navigation}) {
                 <FontAwesome6
                   name={'eye-slash'}
                   size={17}
-                  color={Colors.black}
+                  color={Colors.grey}
                 />
               ) : (
-                <FontAwesome6 name={'eye'} size={17} color={Colors.black} />
+                <FontAwesome6 name={'eye'} size={17} color={Colors.grey} />
               )}
             </TouchableOpacity>
           </View>
@@ -95,7 +101,7 @@ export default function LoginScreen({navigation}) {
       <Modal visible={isLoader} transparent>
         <Loader />
       </Modal>
-    </View>
+    </ImageBackground>
   );
 }
 
@@ -105,15 +111,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: '2%',
-    backgroundColor: Colors.primaryColor,
+    // backgroundColor: Colors.primaryColor,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject, // This makes the overlay cover the entire background
+    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Adjust opacity with the alpha value (0.4 here)
+    
   },
   login_container: {
-    height: 330,
-    width: '100%',
-    backgroundColor: Colors.white,
-    borderRadius: 10,
+    height: 380,
+    width: '90%',
+    borderRadius: 20,
     paddingHorizontal: 5,
     paddingVertical: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Glass effect: white + transparency
+    borderColor: 'rgba(255, 255, 255, 0.3)', // Slight border to enhance effect
+    borderWidth: 1,
+    shadowColor: '#000', // Shadow to lift the glass card off the background
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.2,
+    shadowRadius: 10,
   },
   image_container: {
     height: 90,
@@ -129,9 +148,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   heading_font: {
-    color: Colors.black,
+    color:'white',
     fontSize: 25,
     fontWeight: 'bold',
+   
   },
   input_container: {
     height: 200,
@@ -140,20 +160,43 @@ const styles = StyleSheet.create({
   login_button_container: {
     height: 90,
     alignItems: 'center',
+    
   },
   login_button: {
     padding: 10,
-    backgroundColor: Colors.primaryColor,
-    borderRadius: 10,
+    backgroundColor:'#f68084',
+    borderRadius: 20,
+    width:230,
+    marginTop:30,
+     shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 5,
+    elevation: 8, // Shadow effect on Android
+   
   },
   button_font: {
     color: Colors.white,
     fontSize: 17,
+     textAlign:'center',
+     fontWeight:'bold'
   },
   password_field: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
     flexDirection: 'row',
     marginBottom: 10,
     marginTop: 10,
     alignItems: 'center',
+    paddingLeft:17
   },
+  input_filed: {
+    backgroundColor: '#f2f2f2',
+    borderRadius: 30,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    marginBottom: 15,
+    fontSize: 16,
+    color: Colors.black,
+  }
 });
