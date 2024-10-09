@@ -36,7 +36,7 @@ export default function Library({ navigation }) {
     <Text style={styles.progressLeftText}>Training completed</Text>
     <Text style={styles.progressRightText}>50%</Text>
   </View>
-        <Progress.Bar progress={0.5} width={340} height={15} borderRadius={25} animated={true} color='#ffc100' style={styles.progressbar} />
+        <Progress.Bar progress={0.5} width={320} height={15} borderRadius={25} animated={true} color='#ffc100' style={styles.progressbar} />
 
       </View>
       {/*Latest Learned*/}
