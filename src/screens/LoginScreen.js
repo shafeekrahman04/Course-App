@@ -14,6 +14,7 @@ import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
 
+
 export default function LoginScreen({navigation}) {
   const [showPassword, setShowPassword] = useState(true);
   const [isLoader, setIsloader] = useState(false);
@@ -36,15 +37,11 @@ export default function LoginScreen({navigation}) {
   };
 
   return (
-    <ImageBackground
-      source={require('../../assets/logo/bgg.png')}
-      resizeMode='cover'
-      blurRadius={1}
-      style={styles.body}>
-        <View style={styles.overlay}/>
+    <View style={styles.body}>
+        {/* <View style={styles.overlay}/> */}
       <View style={styles.image_container}>
         <Image
-          source={require('../../assets/logo/logo.png')}
+          source={require('../../assets/logo/loginimg.jpg')}
           style={styles.image}
         />
       </View>
@@ -53,7 +50,7 @@ export default function LoginScreen({navigation}) {
           <Text style={styles.heading_font}>Login</Text>
         </View>
         <View style={styles.input_container}>
-          <View style={{paddingBottom: 20, paddingTop: 10}}>
+          <View style={{paddingBottom: 20}}>
             <TextInput
               style={[styles.input_filed]}
               placeholderTextColor={'grey'}
@@ -89,11 +86,39 @@ export default function LoginScreen({navigation}) {
               )}
             </TouchableOpacity>
           </View>
+          <TouchableOpacity >
+            <Text style={styles.forgot_password_text}>Forgot Password?</Text>
+          </TouchableOpacity>
+      
         </View>
         <View style={styles.login_button_container}>
           <TouchableOpacity onPress={() => login()} style={styles.login_button}>
             <Text style={styles.button_font}>LOGIN</Text>
           </TouchableOpacity>
+        </View>
+        <View style={styles.signup_container}>
+          <Text style={styles.signup_text}>Don't have an account? </Text>
+          <TouchableOpacity >
+            <Text style={styles.signup_link}>Sign Up</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Login with Google or Facebook */}
+        <View style={styles.social_login_container}>
+          <Text style={styles.social_login_text}>Also login with</Text>
+          <View style={styles.social_buttons}>
+            {/* Facebook Login Button */}
+            <TouchableOpacity style={styles.facebook_button}>
+              <FontAwesome6 name="facebook" size={22} color="blue" />
+              
+            </TouchableOpacity>
+
+            {/* Google Login Button */}
+            <TouchableOpacity style={styles.google_button}>
+              <FontAwesome6 name="google" size={22} color="red" />
+             
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
       <AlertMessage message={alertMessage} messageType={alertType} />
@@ -101,7 +126,7 @@ export default function LoginScreen({navigation}) {
       <Modal visible={isLoader} transparent>
         <Loader />
       </Modal>
-    </ImageBackground>
+    </View>
   );
 }
 
@@ -111,63 +136,52 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: '2%',
-    // backgroundColor: Colors.primaryColor,
+    backgroundColor: '#fff',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject, // This makes the overlay cover the entire background
-    backgroundColor: 'rgba(0, 0, 0, 0.3)', // Adjust opacity with the alpha value (0.4 here)
+ 
+  image_container: {
+    width: '100%',
+    height: '40%',
+    flex:1,
     
   },
-  login_container: {
-    height: 380,
-    width: '90%',
-    borderRadius: 20,
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.2)', // Glass effect: white + transparency
-    borderColor: 'rgba(255, 255, 255, 0.3)', // Slight border to enhance effect
-    borderWidth: 1,
-    shadowColor: '#000', // Shadow to lift the glass card off the background
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-  },
-  image_container: {
-    height: 90,
-    marginBottom: 10,
-  },
   image: {
+    width: '100%',
     height: '100%',
-    resizeMode: 'contain',
+    resizeMode: 'cover',
+    justifyContent: 'center',
   },
   heading: {
-    height: 50,
+    // height: 30,
     alignItems: 'center',
     justifyContent: 'center',
   },
   heading_font: {
-    color:'white',
+    color:'#ffc100',
     fontSize: 25,
     fontWeight: 'bold',
    
   },
   input_container: {
-    height: 200,
+    height: '46%',
     justifyContent: 'center',
+    width:'80%'
   },
   login_button_container: {
     height: 90,
     alignItems: 'center',
-    
+  
+  },
+  forgot_password_text:{
+    textAlign:'right',
+    paddingRight:10
   },
   login_button: {
     padding: 10,
-    backgroundColor:'#f68084',
+    backgroundColor:'#eebd01',
     borderRadius: 20,
-    width:230,
-    marginTop:30,
+    width:150,
+   
      shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
@@ -182,21 +196,57 @@ const styles = StyleSheet.create({
      fontWeight:'bold'
   },
   password_field: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
     borderRadius: 30,
     flexDirection: 'row',
     marginBottom: 10,
-    marginTop: 10,
+    
     alignItems: 'center',
-    paddingLeft:17
+    paddingLeft:17,
+    borderColor:'#ffc100',
+    borderWidth:2
   },
   input_filed: {
-    backgroundColor: '#f2f2f2',
+    backgroundColor: '#fff',
     borderRadius: 30,
     paddingVertical: 10,
     paddingHorizontal: 20,
     marginBottom: 15,
     fontSize: 16,
     color: Colors.black,
-  }
+    width:'100%',
+    borderColor:'#ffc100',
+    borderWidth:2
+  },
+  signup_container: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom:2
+  },
+  signup_text: {
+    color: '#333333',
+    fontSize: 14,
+  },
+  signup_link: {
+    color: '#feb662',
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  social_login_container: {
+    marginTop: 20,
+    alignItems: 'center',
+    flexDirection:'row',
+    gap:20,
+    justifyContent:'center'
+  },
+  social_login_text: {
+    color: '#333333',
+    fontSize: 14,
+    // marginBottom: 10,
+  },
+  social_buttons:{
+    flexDirection:'row',
+    gap:20
+  },
 });
