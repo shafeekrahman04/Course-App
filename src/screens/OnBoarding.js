@@ -34,7 +34,7 @@ const OnBoardingScreen = ({navigation}) => {
         loop={false}
         onIndexChanged={index => setCurrentIndex(index)}
         showsPagination={true}
-        activeDotColor="#4CAF50"
+        activeDotColor="#eebd01"
         dotColor="#C0C0C0"
         ref={ref => (swiperRef = ref)} // Get Swiper reference
       >
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   nextButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#eebd01',
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 25,
