@@ -12,9 +12,8 @@ import {TextInput} from 'react-native-gesture-handler';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
-import { useAuth } from '../security/AuthContext';
-import { alertMessageType } from '../utilities/enum/Enum';
-
+import {useAuth} from '../security/AuthContext';
+import {alertMessageType} from '../utilities/enum/Enum';
 
 export default function LoginScreen({navigation}) {
   const authContext = useAuth();
@@ -25,50 +24,50 @@ export default function LoginScreen({navigation}) {
   const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
 
-  const [alertMessage, setAlertMessage] = useState({ message: '', timestamp: Date.now() });
+  const [alertMessage, setAlertMessage] = useState({
+    message: '',
+    timestamp: Date.now(),
+  });
   const [alertType, setAlertType] = useState('');
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  
   const alertMessagePopUp = (message, messageType) => {
-    setAlertMessage({ message: message, timestamp: new Date() });
+    setAlertMessage({message: message, timestamp: new Date()});
     setAlertType(messageType);
-}
+  };
 
   const loginValidation = () => {
-    let isValid = true
+    let isValid = true;
     if (loginId.length == 0) {
-        alertMessagePopUp('Please enter login Id', alertMessageType.WARNING.code)
-        return false
+      alertMessagePopUp('Please enter login Id', alertMessageType.WARNING.code);
+      return false;
     }
     if (password.length == 0) {
-        alertMessagePopUp('Please enter password', alertMessageType.WARNING.code);
-        return false;
+      alertMessagePopUp('Please enter password', alertMessageType.WARNING.code);
+      return false;
     }
     return isValid;
-}
+  };
 
-async function login() {
-  if (loginValidation()) {
-    setLoader(true);
-    const loginSuccess = await authContext.login(loginId, password);
-    setLoader(false);
-    
-    if (loginSuccess) {
-      alertMessagePopUp('Login successful', alertMessageType.SUCCESS.code);
-      
-      setTimeout(() => {
-        navigation.replace('HomeTab');
-      }, 500);
-    } else if (authContext.error) {
-      alertMessagePopUp('Invalid credentials', alertMessageType.DANGER.code);
+  async function login() {
+    if (loginValidation()) {
+      setLoader(true);
+      const loginSuccess = await authContext.login(loginId, password);
+      setLoader(false);
+      if (loginSuccess) {
+        alertMessagePopUp('Login successful', alertMessageType.SUCCESS.code);
+
+        setTimeout(() => {
+          navigation.replace('HomeTab');
+        }, 500);
+      } else {
+        alertMessagePopUp(authContext.error, alertMessageType.DANGER.code);
+      }
     }
   }
-}
-
 
   return (
     <View style={styles.body}>
@@ -95,7 +94,7 @@ async function login() {
               }}
             />
           </View>
-          <View style={[ styles.password_field]}>
+          <View style={[styles.password_field]}>
             <TextInput
               style={{width: '90%', color: 'grey'}}
               placeholderTextColor={'grey'}
@@ -118,7 +117,6 @@ async function login() {
               )}
             </TouchableOpacity>
           </View>
-      
         </View>
         <View style={styles.login_button_container}>
           <TouchableOpacity onPress={() => login()} style={styles.login_button}>
@@ -143,12 +141,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: '2%',
     backgroundColor: '#fff',
   },
- 
+
   image_container: {
     width: '100%',
     height: '40%',
-    flex:1,
-    
+    flex: 1,
   },
   image: {
     width: '100%',
@@ -162,54 +159,51 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   heading_font: {
-    color:'#ffc100',
+    color: '#ffc100',
     fontSize: 25,
     fontWeight: 'bold',
-   
   },
   input_container: {
     height: '46%',
     justifyContent: 'center',
-    width:'80%'
+    width: '80%',
   },
   login_button_container: {
     height: 90,
     alignItems: 'center',
-  
   },
-  forgot_password_text:{
-    textAlign:'right',
-    paddingRight:10
+  forgot_password_text: {
+    textAlign: 'right',
+    paddingRight: 10,
   },
   login_button: {
     padding: 10,
-    backgroundColor:'#eebd01',
+    backgroundColor: '#eebd01',
     borderRadius: 20,
-    width:150,
-   
-     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    width: 150,
+
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.4,
     shadowRadius: 5,
     elevation: 8, // Shadow effect on Android
-   
   },
   button_font: {
     color: Colors.white,
     fontSize: 17,
-     textAlign:'center',
-     fontWeight:'bold'
+    textAlign: 'center',
+    fontWeight: 'bold',
   },
   password_field: {
     backgroundColor: '#fff',
     borderRadius: 30,
     flexDirection: 'row',
     marginBottom: 10,
-    
+
     alignItems: 'center',
-    paddingLeft:17,
-    borderColor:'#ffc100',
-    borderWidth:2
+    paddingLeft: 17,
+    borderColor: '#ffc100',
+    borderWidth: 2,
   },
   input_filed: {
     backgroundColor: '#fff',
@@ -219,15 +213,15 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontSize: 16,
     color: Colors.black,
-    width:'100%',
-    borderColor:'#ffc100',
-    borderWidth:2
+    width: '100%',
+    borderColor: '#ffc100',
+    borderWidth: 2,
   },
   signup_container: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom:2
+    paddingBottom: 2,
   },
   signup_text: {
     color: '#333333',
@@ -241,17 +235,17 @@ const styles = StyleSheet.create({
   social_login_container: {
     marginTop: 20,
     alignItems: 'center',
-    flexDirection:'row',
-    gap:20,
-    justifyContent:'center'
+    flexDirection: 'row',
+    gap: 20,
+    justifyContent: 'center',
   },
   social_login_text: {
     color: '#333333',
     fontSize: 14,
     // marginBottom: 10,
   },
-  social_buttons:{
-    flexDirection:'row',
-    gap:20
+  social_buttons: {
+    flexDirection: 'row',
+    gap: 20,
   },
 });
