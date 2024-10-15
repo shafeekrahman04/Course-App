@@ -2,10 +2,10 @@ import {Image, Modal, StyleSheet, View} from 'react-native';
 import React, {useEffect, useState} from 'react';
 import {Colors} from '../utilities/styles/GlobalStyles';
 import Loader from '../shared/Loader';
-import {alterMessageType} from '../utilities/enum/Enum';
+import {alertMessageType} from '../utilities/enum/Enum';
 import AlertMessage from '../shared/AlertMessage';
 
-export default function SpalshScreen({navigation}) {
+export default function SpalshScreen() {
   const [isLoader, setIsloader] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     message: '',
@@ -16,16 +16,23 @@ export default function SpalshScreen({navigation}) {
   const isLogIn = async () => {
     try {
       setIsloader(true);
-      navigation.replace('Login');
-      setIsloader(false);
+      const isAuthenticated = await AsyncStorage.getItem('isAuthenticate');
+  
+      if (isAuthenticated === 'true') {
+        navigate('HomeTab');
+      } else {
+        navigate('Login');
+      }
     } catch (e) {
-      setIsloader(false);
-      alterMessagePopUp('Something is wrong', alterMessageType.DANGER.code);
+      alertMessagePopUp('Something went wrong', alertMessageType.DANGER.code);
       console.log(e);
+    } finally {
+      setIsloader(false);
     }
   };
+  
 
-  const alterMessagePopUp = (message, messageType) => {
+  const alertMessagePopUp = (message, messageType) => {
     setAlertMessage({message: message, timestamp: new Date()});
     setAlertType(messageType);
   };

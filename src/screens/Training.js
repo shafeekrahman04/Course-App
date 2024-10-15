@@ -12,6 +12,7 @@ import {
  
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useAuth } from '../security/AuthContext';
 
 
 const categories = [
@@ -48,10 +49,17 @@ const popularCourses = [
 ];
 
 export default function Training({ navigation }) {
+  const authContext = useAuth();
 
   const openVideo = (videoUri) => {
     navigation.navigate('VideoScreen', { videoUri });
   };
+
+  function logoutHandler() {
+    authContext.logout();
+    navigation.navigate("Login");
+  }
+
   return (
 
     <ScrollView style={styles.container}
@@ -63,11 +71,13 @@ export default function Training({ navigation }) {
         source={require('../../assets/logo/bg1.jpg')}
       >
         <View style={styles.header}>
-
           <Text style={styles.welcomeText}>Hi, ALEX</Text>
           <Text style={styles.subText}>Let's start learning!</Text>
           <TouchableOpacity style={styles.notificationIcon}>
-            <Icon name="notifications-outline" size={25} color="#000" />
+            <Icon name="notifications-outline" size={25} color="#000"/>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.notificationIcon}>
+            <Icon name="log-out-outline" size={25} color="#000" onPress={logoutHandler}/>
           </TouchableOpacity>
         </View>
       </ImageBackground>

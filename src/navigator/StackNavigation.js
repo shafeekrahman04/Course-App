@@ -1,7 +1,8 @@
 import {StyleSheet} from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SpalshScreen from '../screens/SpalshScreen';
 import LoginScreen from '../screens/LoginScreen';
 import BottomTab from './BottomTab';
@@ -11,16 +12,39 @@ import OnboardingScreen from '../screens/OnBoarding';
 const Stack = createStackNavigator();
 
 export default function StackNavigation() {
-  useEffect(() => {}, []);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check AsyncStorage for authentication status
+    const checkAuthentication = async () => {
+      try {
+        const authStatus = await AsyncStorage.getItem('isAuthenticated');
+        setIsAuthenticated(authStatus === 'true');
+      } catch (error) {
+        console.log('Error checking auth status:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthentication();
+  }, []);
+
+  if (isLoading) {
+    return <SpalshScreen />;
+  }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen
-          name="Onboarding"
-          component={OnboardingScreen}
-          options={{headerShown: false}}
-        />
+      <Stack.Navigator initialRouteName={isAuthenticated ? 'HomeTab' : 'Onboarding'}>
+        {!isAuthenticated && (
+          <Stack.Screen
+            name="Onboarding"
+            component={OnboardingScreen}
+            options={{headerShown: false}}
+          />
+        )}
         <Stack.Screen
           name="Splash"
           component={SpalshScreen}

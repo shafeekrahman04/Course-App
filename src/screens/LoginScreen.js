@@ -1,6 +1,5 @@
 import {
   Image,
-  ImageBackground,
   Modal,
   StyleSheet,
   Text,
@@ -8,37 +7,71 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import GlobalStyles, {Colors} from '../utilities/styles/GlobalStyles';
+import {Colors} from '../utilities/styles/GlobalStyles';
 import {TextInput} from 'react-native-gesture-handler';
 import FontAwesome6 from 'react-native-vector-icons/FontAwesome6';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
+import { useAuth } from '../security/AuthContext';
+import { alertMessageType } from '../utilities/enum/Enum';
 
 
 export default function LoginScreen({navigation}) {
-  const [showPassword, setShowPassword] = useState(true);
-  const [isLoader, setIsloader] = useState(false);
+  const authContext = useAuth();
 
-  const [mobile, setMobile] = useState('');
+  const [showPassword, setShowPassword] = useState(true);
+  const [loader, setLoader] = useState(false);
+
+  const [loginId, setLoginId] = useState('');
   const [password, setPassword] = useState('');
 
-  const [alertMessage, setAlertMessage] = useState({
-    message: '',
-    timestamp: Date.now(),
-  });
+  const [alertMessage, setAlertMessage] = useState({ message: '', timestamp: Date.now() });
   const [alertType, setAlertType] = useState('');
 
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  const login = () => {
-    navigation.replace('HomeTab');
-  };
+  
+  const alertMessagePopUp = (message, messageType) => {
+    setAlertMessage({ message: message, timestamp: new Date() });
+    setAlertType(messageType);
+}
+
+  const loginValidation = () => {
+    let isValid = true
+    if (loginId.length == 0) {
+        alertMessagePopUp('Please enter login Id', alertMessageType.WARNING.code)
+        return false
+    }
+    if (password.length == 0) {
+        alertMessagePopUp('Please enter password', alertMessageType.WARNING.code);
+        return false;
+    }
+    return isValid;
+}
+
+async function login() {
+  if (loginValidation()) {
+    setLoader(true);
+    const loginSuccess = await authContext.login(loginId, password);
+    setLoader(false);
+    
+    if (loginSuccess) {
+      alertMessagePopUp('Login successful', alertMessageType.SUCCESS.code);
+      
+      setTimeout(() => {
+        navigation.replace('HomeTab');
+      }, 500);
+    } else if (authContext.error) {
+      alertMessagePopUp('Invalid credentials', alertMessageType.DANGER.code);
+    }
+  }
+}
+
 
   return (
     <View style={styles.body}>
-        {/* <View style={styles.overlay}/> */}
       <View style={styles.image_container}>
         <Image
           source={require('../../assets/logo/loginimg.jpg')}
@@ -54,12 +87,11 @@ export default function LoginScreen({navigation}) {
             <TextInput
               style={[styles.input_filed]}
               placeholderTextColor={'grey'}
-              placeholder="Mobile Number"
+              placeholder="Login Id"
               maxLength={10}
-              keyboardType="phone-pad"
-              value={mobile}
+              value={loginId}
               onChangeText={v => {
-                setMobile(v);
+                setLoginId(v);
               }}
             />
           </View>
@@ -86,9 +118,6 @@ export default function LoginScreen({navigation}) {
               )}
             </TouchableOpacity>
           </View>
-          <TouchableOpacity >
-            <Text style={styles.forgot_password_text}>Forgot Password?</Text>
-          </TouchableOpacity>
       
         </View>
         <View style={styles.login_button_container}>
@@ -96,34 +125,10 @@ export default function LoginScreen({navigation}) {
             <Text style={styles.button_font}>LOGIN</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.signup_container}>
-          <Text style={styles.signup_text}>Don't have an account? </Text>
-          <TouchableOpacity >
-            <Text style={styles.signup_link}>Sign Up</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Login with Google or Facebook */}
-        <View style={styles.social_login_container}>
-          <Text style={styles.social_login_text}>Also login with</Text>
-          <View style={styles.social_buttons}>
-            {/* Facebook Login Button */}
-            <TouchableOpacity style={styles.facebook_button}>
-              <FontAwesome6 name="facebook" size={22} color="blue" />
-              
-            </TouchableOpacity>
-
-            {/* Google Login Button */}
-            <TouchableOpacity style={styles.google_button}>
-              <FontAwesome6 name="google" size={22} color="red" />
-             
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
       <AlertMessage message={alertMessage} messageType={alertType} />
       {/* loader */}
-      <Modal visible={isLoader} transparent>
+      <Modal visible={loader} transparent>
         <Loader />
       </Modal>
     </View>
