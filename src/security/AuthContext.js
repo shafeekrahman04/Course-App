@@ -6,8 +6,23 @@ export const AuthContext = createContext();
 export const useAuth = () => useContext(AuthContext);
 
 export default function AuthContextProvider({ children }) {
-  const [token, setToken] = useState(AsyncStorage.getItem("token"));
+  const [token, setToken] = useState( null);
   const [error, setError] = useState("");
+  const [isFresh, setIsFresh] = useState(false);
+
+  useEffect(()=>{
+    const loadToken = async () => {
+      const storedToken = await AsyncStorage.getItem("token");
+      setToken(storedToken);
+    };
+
+    const checkFreshStatus = async () => {
+      const freshStatus = await AsyncStorage.getItem('isFresh');
+      setIsFresh(freshStatus === 'true');
+    };
+    loadToken();
+    checkFreshStatus();
+  },[]);
 
   useEffect(() => {
     if (token) {
@@ -29,6 +44,7 @@ export default function AuthContextProvider({ children }) {
         AsyncStorage.setItem("RefreshToken", data.RefreshToken);
         AsyncStorage.setItem("user", JSON.stringify(data.user));
         AsyncStorage.setItem("isAuthenticated", "true");
+        AsyncStorage.setItem("isFresh","false");
         return true;
       } else {
         setError(response.data.StatusMessage);

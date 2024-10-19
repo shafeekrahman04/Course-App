@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions, TextInput, ScrollView } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions, TextInput, ScrollView, Modal } from 'react-native';
 import Video from 'react-native-video';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
@@ -34,10 +34,15 @@ export default function VideoScreen() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
+  const [isQuizButton, setIsQuizButton] = useState(false);
+  const [isQuizModal, setIsQuizModal] = useState(false);
+  const [isQuizSubmit, setIsQuizSubmit] = useState(false);
 
   const playVideo = (video) => {
     setCurrentVideo(video); // Update the video source
     setIsPlaying(true); // Start playing the video
+    setIsQuizButton(false);
+    setIsQuizSubmit(false);
   };
 
   const submitComment = () => {
@@ -63,6 +68,28 @@ export default function VideoScreen() {
     </View>
   );
 
+  // fn handle vdo completion
+  const handleVideoEnd = () => {
+    if (!isQuizSubmit) {
+      setIsQuizButton(true);
+    }
+  }
+
+  const openQuizModal = () => {
+    setIsQuizModal(true);
+  }
+
+  const closeQuizModal = () => {
+    setIsQuizModal(false);
+  }
+
+
+  const submitQuiz = () => {
+    setIsQuizSubmit(true);
+    setIsQuizModal(false);
+    setIsQuizButton(false);
+  }
+
   return (
     <ScrollView style={styles.container}>
       {/* Video Player */}
@@ -74,6 +101,7 @@ export default function VideoScreen() {
           resizeMode="contain"
           controls={true}
           paused={!isPlaying}
+          onEnd={handleVideoEnd}
         />
         {!isPlaying && (
           <TouchableOpacity
@@ -81,6 +109,13 @@ export default function VideoScreen() {
             onPress={() => setIsPlaying(true)}
           >
             <Ionicons name="play-circle-outline" size={64} color="#fff" />
+          </TouchableOpacity>
+        )}
+
+        {/**Quiz button */}
+        {isQuizButton && !isQuizSubmit && (
+          <TouchableOpacity style={styles.quizButton} onPress={openQuizModal}>
+            <Text style={styles.quizbtnText}>Take the Quiz</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -101,6 +136,22 @@ export default function VideoScreen() {
           showsVerticalScrollIndicator={false}
         />
       </View>
+
+      {/**quiz modal */}
+
+      <Modal
+        animationType='slide'
+        transparent={true}
+        visible={isQuizModal}
+        onRequestClose={closeQuizModal}
+      >
+        <View style={styles.modalView}>
+          <Text style={styles.modaltxt}>This is the quiz!</Text>
+          <TouchableOpacity style={styles.submitQuizbtn} onPress={submitQuiz}>
+            <Text style={styles.submitQuizTxt}>Submit Quiz</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
 
       {/* Comments Section */}
       <View style={styles.commentSection}>
@@ -178,12 +229,52 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 8,
     marginRight: 10,
+    alignSelf: 'center',
+  },
+  quizbtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 18,
+
+  },
+  modalView: {
+    marginTop: 20,
+    backgroundColor: 'white',
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 20,
+    borderRadius: 8,
+    elevation: 5
+  },
+  modaltxt: {
+    fontSize: 18,
+    marginBottom: 20
+  },
+  submitQuizbtn: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  submitQuizTxt: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16
   },
   recommendText: {
     fontSize: 16,
     color: '#000',
     fontWeight: 'bold',
     flex: 1,
+  },
+  quizButton: {
+    position: 'absolute',
+    bottom: '45%',
+    backgroundColor: '#28a745',
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
   },
   commentSection: {
     padding: 15,

@@ -1,11 +1,12 @@
-import {Image, Modal, StyleSheet, View} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {Colors} from '../utilities/styles/GlobalStyles';
+import { Image, Modal, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Colors } from '../utilities/styles/GlobalStyles';
 import Loader from '../shared/Loader';
-import {alertMessageType} from '../utilities/enum/Enum';
+import { alertMessageType } from '../utilities/enum/Enum';
 import AlertMessage from '../shared/AlertMessage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function SpalshScreen() {
+export default function SplashScreen({ navigation }) {
   const [isLoader, setIsloader] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     message: '',
@@ -17,23 +18,24 @@ export default function SpalshScreen() {
     try {
       setIsloader(true);
       const isAuthenticated = await AsyncStorage.getItem('isAuthenticate');
-  
+      console.log('retrice isAuthenticated value:', isAuthenticated);
       if (isAuthenticated === 'true') {
-        navigate('HomeTab');
+        navigation.replace('HomeTab');
       } else {
-        navigate('Login');
+        navigation.replace('Login');
       }
     } catch (e) {
       alertMessagePopUp('Something went wrong', alertMessageType.DANGER.code);
+      console.log('error retrieve auth status:', e);
       console.log(e);
     } finally {
       setIsloader(false);
     }
   };
-  
+
 
   const alertMessagePopUp = (message, messageType) => {
-    setAlertMessage({message: message, timestamp: new Date()});
+    setAlertMessage({ message: message, timestamp: new Date() });
     setAlertType(messageType);
   };
 
