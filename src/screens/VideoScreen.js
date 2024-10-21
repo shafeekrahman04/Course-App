@@ -25,8 +25,30 @@ const videoData = [
     uri: 'https://www.w3schools.com/html/mov_bbb.mp4',
     thumbnail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-3.png?alt=media&token=42b8ef40-cdaa-45e2-b8e1-df0454163369',
   },
-  // Add more video data as needed
+
 ];
+
+const quizQuestion = [{
+  question: 'What is the capital of France?',
+  options: ['Paris', 'London', 'Berlin', 'Madrid'],
+  answer: 'Paris,'
+},
+{
+  question: "Which planet is known as the Red Planet?",
+  options: ["Earth", "Mars", "Jupiter", "Saturn"],
+  answer: "Mars",
+},
+{
+  question: "What is the largest ocean on Earth?",
+  options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
+  answer: "Pacific Ocean",
+},
+{
+  question: "Who wrote 'Hamlet'?",
+  options: ["Charles Dickens", "Mark Twain", "William Shakespeare", "Leo Tolstoy"],
+  answer: "William Shakespeare",
+},
+]
 
 export default function VideoScreen() {
   const videoRef = useRef(null);
@@ -37,12 +59,16 @@ export default function VideoScreen() {
   const [isQuizButton, setIsQuizButton] = useState(false);
   const [isQuizModal, setIsQuizModal] = useState(false);
   const [isQuizSubmit, setIsQuizSubmit] = useState(false);
+  const [selectedAnswer, setSelectedAnswer] = useState(Array(quizQuestion.length).fill(null));
+  const [isVideoEnded, setIsVideoEnded] = useState(false);
 
   const playVideo = (video) => {
     setCurrentVideo(video); // Update the video source
     setIsPlaying(true); // Start playing the video
     setIsQuizButton(false);
     setIsQuizSubmit(false);
+    setSelectedAnswer(Array(quizQuestion.length).fill(null));
+    setIsVideoEnded(false);
   };
 
   const submitComment = () => {
@@ -72,6 +98,7 @@ export default function VideoScreen() {
   const handleVideoEnd = () => {
     if (!isQuizSubmit) {
       setIsQuizButton(true);
+      setIsVideoEnded(true);
     }
   }
 
@@ -85,10 +112,40 @@ export default function VideoScreen() {
 
 
   const submitQuiz = () => {
+    const correctAnswer = quizQuestion.map(q => q.answer);
+    const isCorrect = selectedAnswer.every((answer, index) => answer === correctAnswer[index]);
+    alert(isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect')
     setIsQuizSubmit(true);
     setIsQuizModal(false);
     setIsQuizButton(false);
   }
+
+  const handleOptionSelect = (questionIndex, option) => {
+    const newAnswer = [...selectedAnswer];
+    newAnswer[questionIndex] = option;
+    setSelectedAnswer(newAnswer);
+  }
+
+  const renderQuestionItem = ({ item, index }) => (
+    <View key={index} style={styles.quesContainer}>
+      <Text style={styles.quesText}>{item.question}</Text>
+      {item.options.map(option => (
+        <TouchableOpacity
+          key={option}
+          style={styles.optionContainer}
+          onPress={() => handleOptionSelect(index, option)}
+        >
+          <View style={[styles.radioCircle,
+          selectedAnswer[index] === option && styles.selectedRadioCircle
+          ]}>
+            {selectedAnswer[index] === option && <View style={styles.radioInnerCircle} />}
+          </View>
+          <Text style={styles.optionText}>{option}</Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+
 
   return (
     <ScrollView style={styles.container}>
@@ -122,6 +179,11 @@ export default function VideoScreen() {
 
       {/* Title and Description */}
       <View style={styles.videoDetails}>
+        {isVideoEnded &&!isQuizSubmit && (
+          <View style={styles.quizIncomplete}>
+            <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
+          </View>
+        )}
         <Text style={styles.videoTitle}>{currentVideo.title}</Text>
         <Text style={styles.videoDescription}>{currentVideo.description}</Text>
       </View>
@@ -146,7 +208,14 @@ export default function VideoScreen() {
         onRequestClose={closeQuizModal}
       >
         <View style={styles.modalView}>
-          <Text style={styles.modaltxt}>This is the quiz!</Text>
+          <Text style={styles.modaltxt}>Quiz Question</Text>
+          <FlatList
+            data={quizQuestion}
+            renderItem={renderQuestionItem}
+            keyExtractor={(item, index) => index.toString()}
+            style={styles.flatList}
+          />
+
           <TouchableOpacity style={styles.submitQuizbtn} onPress={submitQuiz}>
             <Text style={styles.submitQuizTxt}>Submit Quiz</Text>
           </TouchableOpacity>
@@ -186,6 +255,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'relative'
   },
   video: {
     width: '100%',
@@ -234,7 +304,7 @@ const styles = StyleSheet.create({
   quizbtnText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 15,
 
   },
   modalView: {
@@ -245,14 +315,69 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginHorizontal: 20,
     borderRadius: 8,
-    elevation: 5
+    elevation: 5,
+    flex:1
   },
+  // flatlist:{
+  //   maxHeight:300
+  // },
   modaltxt: {
     fontSize: 18,
-    marginBottom: 20
+    marginBottom: 20,
+    color:'#000'
+  },
+  quesContainer:{
+    marginBottom:20,
+    
+  },
+  quesText:{
+    fontSize:18,
+    fontWeight:'bold',
+    marginBottom:10
+  },
+  optionContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    marginVertical:5,
+    
+  },
+  radioCircle:{
+    height:24,
+    width:24,
+    borderRadius:12,
+    borderWidth:2,
+    borderColor:'#888',
+    alignItems:'center',
+    justifyContent:'center',
+    marginRight:10,
+  },
+  selectedRadioCircle:{
+    borderColor:'#ffc100',
+  },
+  radioInnerCircle:{
+    height:12,
+    width:12,
+    borderRadius:10,
+    backgroundColor:'#ffc100',
+  },
+  optionText:{
+    fontSize:16,
+    color:'#000'
+  },
+  quizIncomplete:{
+    marginBottom:10,
+    padding:10,
+    backgroundColor:'#ffcccc',
+    borderRadius:8,
+  },
+  incompleteTxt:{
+    fontSize:16,
+    fontWeight:'bold',
+    color:'#d9534f',
+    textAlign:'center'
   },
   submitQuizbtn: {
-    backgroundColor: '#007BFF',
+    backgroundColor: 'black',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 8,
@@ -270,11 +395,23 @@ const styles = StyleSheet.create({
   },
   quizButton: {
     position: 'absolute',
-    bottom: '45%',
-    backgroundColor: '#28a745',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    bottom: '15%',
+    left: '78%',
+    backgroundColor: 'rgba(128, 128, 128, 0.7)',
+    paddingVertical: 10,
+    borderColor: 'rgba(255, 255, 255, 0.8)',
+    paddingHorizontal: 15,
+    borderWidth: 1,
+    borderRadius: 25,
+    transform: [{ translateX: -50 }],
+    shadowColor: '#000', // Add shadow for depth
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   commentSection: {
     padding: 15,
