@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,7 @@ import {
   FlatList,
   Dimensions,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Video from 'react-native-video';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -47,7 +48,7 @@ const quizQuestion = [
   {
     question: 'What is the capital of France?',
     options: ['Paris', 'London', 'Berlin', 'Madrid'],
-    answer: 'Paris,',
+    answer: 'Paris',
   },
   {
     question: 'Which planet is known as the Red Planet?',
@@ -76,9 +77,15 @@ const quizQuestion = [
   },
 ];
 
-export default function VideoScreen() {
+export default function VideoScreen({navigation,route}) {
+  const { videoUri, videoId,title,description } = route.params || { videoUri: '', videoId: '',title:'',description:'' };
   const videoRef = useRef(null);
-  const [currentVideo, setCurrentVideo] = useState(videoData[0]);
+  const [currentVideo, setCurrentVideo] = useState({
+    id:videoId || '',
+    uri:videoUri || '',
+    title:title || '',
+    description:description || '',
+  });
   const [isPlaying, setIsPlaying] = useState(false);
   const [isQuizButton, setIsQuizButton] = useState(false);
   const [isQuizModal, setIsQuizModal] = useState(false);
@@ -97,11 +104,11 @@ export default function VideoScreen() {
     setIsVideoEnded(false);
   };
 
-  const renderRecommendedItem = ({item}) => (
+  const renderRecommendedItem = ({ item }) => (
     <TouchableOpacity
       style={styles.recommendItem}
       onPress={() => playVideo(item)}>
-      <Image source={{uri: item.thumbnail}} style={styles.recommendImage} />
+      <Image source={{ uri: item.thumbnail }} style={styles.recommendImage} />
       <Text style={styles.recommendText}>{item.title}</Text>
     </TouchableOpacity>
   );
@@ -121,12 +128,28 @@ export default function VideoScreen() {
   };
 
   const submitQuiz = () => {
-    const correctAnswer = quizQuestion.map(q => q.answer);
+    const correctAnswer = quizQuestion.map(q => q.answer.trim());
     const isCorrect = selectedAnswer.every(
       (answer, index) => answer === correctAnswer[index],
     );
-    alert(
-      isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect',
+    Alert.alert(
+      isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect', '',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setIsQuizSubmit(true);
+            setIsQuizModal(false);
+            setIsQuizButton(false);
+
+            // Pass the quiz status back to the Library screen
+            navigation.navigate('Library', {
+              quizStatus: isCorrect ? 'Attended' : 'complete',
+              videoId: currentVideo.id, // Pass the videoId to identify which video it relates to
+            });
+          },
+        }
+      ]
     );
     setIsQuizSubmit(true);
     setIsQuizModal(false);
@@ -138,7 +161,7 @@ export default function VideoScreen() {
       <View style={styles.videoContainer}>
         <Video
           ref={videoRef}
-          source={{uri: 'https://www.w3schools.com/html/mov_bbb.mp4'}}
+          source={{ uri: currentVideo.uri }}
           style={styles.video}
           resizeMode="contain"
           controls={true}
@@ -290,7 +313,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderWidth: 1,
     borderRadius: 25,
-    transform: [{translateX: -50}],
+    transform: [{ translateX: -50 }],
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
