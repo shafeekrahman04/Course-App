@@ -47,7 +47,7 @@ export default function SplashScreen({ navigation }) {
     <View style={styles.body}>
       <View style={styles.image_container}>
         <Image
-          source={require('../assets/logo/react-logo.png')}
+          source={require('../assets/logo/splash_logo.png')}
           style={styles.image}
         />
       </View>
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: '2%',
-    backgroundColor: Colors.black,
+    backgroundColor: Colors.white,
   },
   image: {
     height: '100%',

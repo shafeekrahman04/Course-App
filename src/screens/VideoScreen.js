@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,21 @@ import {
   FlatList,
   Dimensions,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import Video from 'react-native-video';
-import Ionicons from 'react-native-vector-icons/Ionicons';
 import QuizModal from '../modal/QuizModal';
+import Orientation from 'react-native-orientation-locker';
+import PlayerControls from './video-player/playerControls';
+import ProgressBar from './video-player/progressBar';
+import FullscreenOpen from '../utilities/svg/FullscreenOpen';
+import FullscreenClose from '../utilities/svg/FullscreenClose';
+
+const windowHeight = Dimensions.get('window').width * (9 / 16);
+const windowWidth = Dimensions.get('window').width;
+
+const height = Dimensions.get('window').width;
+const width = Dimensions.get('window').height;
 
 const videoData = [
   {
@@ -84,27 +95,35 @@ export default function VideoScreen() {
   const [isQuizModal, setIsQuizModal] = useState(false);
   const [isQuizSubmit, setIsQuizSubmit] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(
-    Array(quizQuestion.length).fill(null),
+    Array(quizQuestion.length).fill(null)
   );
   const [isVideoEnded, setIsVideoEnded] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [fullscreen, setFullscreen] = useState(false);
+  const [showControl, setShowControl] = useState(true);
 
-  const playVideo = video => {
-    setCurrentVideo(video); // Update the video source
-    setIsPlaying(true); // Start playing the video
+  useEffect(() => {
+    const handleOrientation = (orientation) => {
+      setFullscreen(orientation.includes('LANDSCAPE'));
+      StatusBar.setHidden(orientation.includes('LANDSCAPE'));
+    };
+
+    Orientation.addOrientationListener(handleOrientation);
+    return () => {
+      Orientation.removeOrientationListener(handleOrientation);
+    };
+  }, []);
+
+  const playVideo = (video) => {
+    setCurrentVideo(video);
+    setIsPlaying(true);
     setIsQuizButton(false);
     setIsQuizSubmit(false);
     setSelectedAnswer(Array(quizQuestion.length).fill(null));
     setIsVideoEnded(false);
   };
 
-  const renderRecommendedItem = ({item}) => (
-    <TouchableOpacity
-      style={styles.recommendItem}
-      onPress={() => playVideo(item)}>
-      <Image source={{uri: item.thumbnail}} style={styles.recommendImage} />
-      <Text style={styles.recommendText}>{item.title}</Text>
-    </TouchableOpacity>
-  );
   const handleVideoEnd = () => {
     if (!isQuizSubmit) {
       setIsQuizButton(true);
@@ -112,12 +131,33 @@ export default function VideoScreen() {
     }
   };
 
-  const openQuizModal = () => {
-    setIsQuizModal(true);
+  const handlePlayPause = () => {
+    setIsPlaying((prev) => !prev);
+    setShowControl(true);
+  };
+  
+  const onLoadEnd = (data) => {
+    setDuration(data.duration);
   };
 
-  const closeQuizModal = () => {
-    setIsQuizModal(false);
+  const onProgress = (data) => {
+    setCurrentTime(data.currentTime);
+  };
+
+  const onSeek = (seekTime) => {
+    videoRef.current.seek(seekTime);
+  };
+
+  const handleControls = () => {
+    setShowControl((prev) => !prev);
+  };
+
+  const handleFullscreen = () => {
+    if (fullscreen) {
+      Orientation.unlockAllOrientations();
+    } else {
+      Orientation.lockToLandscapeLeft();
+    }
   };
 
   const submitQuiz = () => {
@@ -135,29 +175,47 @@ export default function VideoScreen() {
 
   return (
     <ScrollView style={styles.container}>
-      <View style={styles.videoContainer}>
-        <Video
-          ref={videoRef}
-          source={{uri: 'https://www.w3schools.com/html/mov_bbb.mp4'}}
-          style={styles.video}
-          resizeMode="contain"
-          controls={true}
-          paused={!isPlaying}
-          onEnd={handleVideoEnd}
-          onError={error => console.log('Video Error: ', error)}
-        />
-        {/* Play button */}
-        {!isPlaying && (
-          <TouchableOpacity
-            style={styles.playButton}
-            onPress={() => setIsPlaying(true)}>
-            <Ionicons name="play-circle-outline" size={64} color="#fff" />
-          </TouchableOpacity>
-        )}
+      <View style={fullscreen ? styles.fullscreenContainer : styles.videoContainer}>
+        <TouchableOpacity onPress={handleControls}>
+          <Video
+            ref={videoRef}
+            source={{ uri: currentVideo.uri}}
+            style={fullscreen ? styles.fullscreenVideo : styles.video}
+            controls={false}
+            resizeMode={'contain'}
+            paused={!isPlaying}
+            onLoad={onLoadEnd}
+            onProgress={onProgress}
+            onEnd={handleVideoEnd}
+          />
 
-        {/* Quiz button */}
+          {showControl && (
+            <View style={styles.controlOverlay}>
+              <TouchableOpacity
+                onPress={handleFullscreen}
+                style={styles.fullscreenButton}>
+                {fullscreen ? <FullscreenClose /> : <FullscreenOpen />}
+              </TouchableOpacity>
+
+              <PlayerControls
+                onPlay={handlePlayPause}
+                onPause={handlePlayPause}
+                playing={isPlaying}
+                skipBackwards={() => onSeek(currentTime - 15)}
+                skipForwards={() => onSeek(currentTime + 15)}
+              />
+
+              <ProgressBar
+                currentTime={currentTime}
+                duration={duration > 0 ? duration : 0}
+                onSlideCapture={onSeek}
+              />
+            </View>
+          )}
+        </TouchableOpacity>
+
         {isQuizButton && !isQuizSubmit && (
-          <TouchableOpacity style={styles.quizButton} onPress={openQuizModal}>
+          <TouchableOpacity style={styles.quizButton} onPress={() => setIsQuizModal(true)}>
             <Text style={styles.quizbtnText}>Take the Quiz</Text>
           </TouchableOpacity>
         )}
@@ -179,8 +237,13 @@ export default function VideoScreen() {
         <Text style={styles.sectionTitle}>Recommended Videos</Text>
         <FlatList
           data={videoData}
-          renderItem={renderRecommendedItem}
-          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={styles.recommendItem} onPress={() => playVideo(item)}>
+              <Image source={{ uri: item.thumbnail }} style={styles.recommendImage} />
+              <Text style={styles.recommendText}>{item.title}</Text>
+            </TouchableOpacity>
+          )}
+          keyExtractor={(item) => item.id}
           showsVerticalScrollIndicator={false}
         />
       </View>
@@ -189,7 +252,7 @@ export default function VideoScreen() {
       <QuizModal
         isVisible={isQuizModal}
         questions={quizQuestion}
-        onClose={closeQuizModal}
+        onClose={() => setIsQuizModal(false)}
         onSubmit={submitQuiz}
         selectedAnswers={selectedAnswer}
         setSelectedAnswer={setSelectedAnswer}
@@ -211,16 +274,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
   },
-  video: {
-    width: '100%',
-    height: '100%',
-  },
-  playButton: {
+  fullscreenContainer: {
+    flex: 1,
+    backgroundColor: '#ebebeb',
     position: 'absolute',
-    zIndex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 5,
   },
+  video: {
+    height: windowHeight,
+    width: windowWidth,
+    backgroundColor: 'black',
+  },
+  fullscreenVideo: {
+    flex: 1,
+    height: height,
+    width: width,
+    backgroundColor: 'black',
+  },
+  text: {
+    marginTop: 30,
+    marginHorizontal: 20,
+    fontSize: 15,
+    textAlign: 'justify',
+  },
+  fullscreenButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignSelf: 'flex-end',
+    alignItems: 'center',
+    paddingRight: 10,
+  },
+  controlOverlay: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#000000c4',
+    justifyContent: 'space-between',
+  },
+
   videoDetails: {
     padding: 15,
   },
@@ -234,6 +330,7 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 5,
   },
+  //recommended
   section: {
     padding: 15,
   },
@@ -255,13 +352,18 @@ const styles = StyleSheet.create({
     marginRight: 10,
     alignSelf: 'center',
   },
+  recommendText: {
+    fontSize: 16,
+    color: '#000',
+    fontWeight: 'bold',
+    flex: 1,
+  },
+  //quiz
   quizbtnText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 15,
   },
-
-  //modal
   quizIncomplete: {
     marginBottom: 10,
     padding: 10,
@@ -274,12 +376,6 @@ const styles = StyleSheet.create({
     color: '#d9534f',
     textAlign: 'center',
   },
-  recommendText: {
-    fontSize: 16,
-    color: '#000',
-    fontWeight: 'bold',
-    flex: 1,
-  },
   quizButton: {
     position: 'absolute',
     bottom: '15%',
@@ -290,7 +386,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderWidth: 1,
     borderRadius: 25,
-    transform: [{translateX: -50}],
+    transform: [{ translateX: -50 }],
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
