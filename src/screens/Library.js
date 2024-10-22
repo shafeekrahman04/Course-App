@@ -95,7 +95,7 @@ export default function Library({ navigation }) {
       {/* Header */}
       <ImageBackground
         style={styles.imgback}
-        source={require('../../assets/logo/bg1.jpg')}
+        source={require('../assets/logo/bg1.jpg')}
       >
         <View style={styles.header}>
           <Text style={styles.title}>Library</Text>

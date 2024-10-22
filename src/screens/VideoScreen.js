@@ -1,68 +1,94 @@
-import React, { useState, useRef } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, FlatList, Dimensions, TextInput, ScrollView, Modal } from 'react-native';
+import React, {useState, useRef} from 'react';
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  FlatList,
+  Dimensions,
+  ScrollView,
+} from 'react-native';
 import Video from 'react-native-video';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import QuizModal from '../modal/QuizModal';
 
 const videoData = [
   {
     id: '1',
     title: 'Voice on Security: USB Drop',
-    description: 'This video discusses the risks of using unknown USB devices and how they can pose a security threat.',
+    description:
+      'This video discusses the risks of using unknown USB devices and how they can pose a security threat.',
     uri: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    thumbnail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
+    thumbnail:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
   },
   {
     id: '2',
     title: 'The Threat of Free WiFi',
-    description: 'Learn about the dangers of using unsecured public WiFi networks and how to protect your data.',
+    description:
+      'Learn about the dangers of using unsecured public WiFi networks and how to protect your data.',
     uri: 'https://www.w3schools.com/html/movie.mp4',
-    thumbnail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
+    thumbnail:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
   },
   {
     id: '3',
     title: 'Cybersecurity Essentials',
-    description: 'An introduction to the basics of cybersecurity and why it’s important for everyone.',
+    description:
+      'An introduction to the basics of cybersecurity and why it’s important for everyone.',
     uri: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    thumbnail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-3.png?alt=media&token=42b8ef40-cdaa-45e2-b8e1-df0454163369',
+    thumbnail:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-3.png?alt=media&token=42b8ef40-cdaa-45e2-b8e1-df0454163369',
   },
-
 ];
 
-const quizQuestion = [{
-  question: 'What is the capital of France?',
-  options: ['Paris', 'London', 'Berlin', 'Madrid'],
-  answer: 'Paris,'
-},
-{
-  question: "Which planet is known as the Red Planet?",
-  options: ["Earth", "Mars", "Jupiter", "Saturn"],
-  answer: "Mars",
-},
-{
-  question: "What is the largest ocean on Earth?",
-  options: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean", "Pacific Ocean"],
-  answer: "Pacific Ocean",
-},
-{
-  question: "Who wrote 'Hamlet'?",
-  options: ["Charles Dickens", "Mark Twain", "William Shakespeare", "Leo Tolstoy"],
-  answer: "William Shakespeare",
-},
-]
+const quizQuestion = [
+  {
+    question: 'What is the capital of France?',
+    options: ['Paris', 'London', 'Berlin', 'Madrid'],
+    answer: 'Paris,',
+  },
+  {
+    question: 'Which planet is known as the Red Planet?',
+    options: ['Earth', 'Mars', 'Jupiter', 'Saturn'],
+    answer: 'Mars',
+  },
+  {
+    question: 'What is the largest ocean on Earth?',
+    options: [
+      'Atlantic Ocean',
+      'Indian Ocean',
+      'Arctic Ocean',
+      'Pacific Ocean',
+    ],
+    answer: 'Pacific Ocean',
+  },
+  {
+    question: "Who wrote 'Hamlet'?",
+    options: [
+      'Charles Dickens',
+      'Mark Twain',
+      'William Shakespeare',
+      'Leo Tolstoy',
+    ],
+    answer: 'William Shakespeare',
+  },
+];
 
 export default function VideoScreen() {
   const videoRef = useRef(null);
-  const [currentVideo, setCurrentVideo] = useState(videoData[0]); // Default video
+  const [currentVideo, setCurrentVideo] = useState(videoData[0]);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [comment, setComment] = useState('');
-  const [comments, setComments] = useState([]);
   const [isQuizButton, setIsQuizButton] = useState(false);
   const [isQuizModal, setIsQuizModal] = useState(false);
   const [isQuizSubmit, setIsQuizSubmit] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState(Array(quizQuestion.length).fill(null));
+  const [selectedAnswer, setSelectedAnswer] = useState(
+    Array(quizQuestion.length).fill(null),
+  );
   const [isVideoEnded, setIsVideoEnded] = useState(false);
 
-  const playVideo = (video) => {
+  const playVideo = video => {
     setCurrentVideo(video); // Update the video source
     setIsPlaying(true); // Start playing the video
     setIsQuizButton(false);
@@ -71,105 +97,65 @@ export default function VideoScreen() {
     setIsVideoEnded(false);
   };
 
-  const submitComment = () => {
-    if (comment.trim()) {
-      setComments([...comments, comment]);
-      setComment('');
-    }
-  };
-
-  const renderRecommendedItem = ({ item }) => (
+  const renderRecommendedItem = ({item}) => (
     <TouchableOpacity
       style={styles.recommendItem}
-      onPress={() => playVideo(item)}
-    >
-      <Image source={{ uri: item.thumbnail }} style={styles.recommendImage} />
+      onPress={() => playVideo(item)}>
+      <Image source={{uri: item.thumbnail}} style={styles.recommendImage} />
       <Text style={styles.recommendText}>{item.title}</Text>
     </TouchableOpacity>
   );
-
-  const renderComment = ({ item }) => (
-    <View style={styles.commentContainer}>
-      <Text style={styles.commentText}>{item}</Text>
-    </View>
-  );
-
-  // fn handle vdo completion
   const handleVideoEnd = () => {
     if (!isQuizSubmit) {
       setIsQuizButton(true);
       setIsVideoEnded(true);
     }
-  }
+  };
 
   const openQuizModal = () => {
     setIsQuizModal(true);
-  }
+  };
 
   const closeQuizModal = () => {
     setIsQuizModal(false);
-  }
-
+  };
 
   const submitQuiz = () => {
     const correctAnswer = quizQuestion.map(q => q.answer);
-    const isCorrect = selectedAnswer.every((answer, index) => answer === correctAnswer[index]);
-    alert(isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect')
+    const isCorrect = selectedAnswer.every(
+      (answer, index) => answer === correctAnswer[index],
+    );
+    alert(
+      isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect',
+    );
     setIsQuizSubmit(true);
     setIsQuizModal(false);
     setIsQuizButton(false);
-  }
-
-  const handleOptionSelect = (questionIndex, option) => {
-    const newAnswer = [...selectedAnswer];
-    newAnswer[questionIndex] = option;
-    setSelectedAnswer(newAnswer);
-  }
-
-  const renderQuestionItem = ({ item, index }) => (
-    <View key={index} style={styles.quesContainer}>
-      <Text style={styles.quesText}>{item.question}</Text>
-      {item.options.map(option => (
-        <TouchableOpacity
-          key={option}
-          style={styles.optionContainer}
-          onPress={() => handleOptionSelect(index, option)}
-        >
-          <View style={[styles.radioCircle,
-          selectedAnswer[index] === option && styles.selectedRadioCircle
-          ]}>
-            {selectedAnswer[index] === option && <View style={styles.radioInnerCircle} />}
-          </View>
-          <Text style={styles.optionText}>{option}</Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-
+  };
 
   return (
     <ScrollView style={styles.container}>
-      {/* Video Player */}
       <View style={styles.videoContainer}>
         <Video
           ref={videoRef}
-          source={{ uri: currentVideo.uri }}
+          source={{uri: 'https://www.w3schools.com/html/mov_bbb.mp4'}}
           style={styles.video}
           resizeMode="contain"
           controls={true}
           paused={!isPlaying}
           onEnd={handleVideoEnd}
+          onError={error => console.log('Video Error: ', error)}
         />
+        {/* Play button */}
         {!isPlaying && (
           <TouchableOpacity
             style={styles.playButton}
-            onPress={() => setIsPlaying(true)}
-          >
+            onPress={() => setIsPlaying(true)}>
             <Ionicons name="play-circle-outline" size={64} color="#fff" />
           </TouchableOpacity>
         )}
 
-        {/**Quiz button */}
+        {/* Quiz button */}
         {isQuizButton && !isQuizSubmit && (
           <TouchableOpacity style={styles.quizButton} onPress={openQuizModal}>
             <Text style={styles.quizbtnText}>Take the Quiz</Text>
@@ -177,9 +163,9 @@ export default function VideoScreen() {
         )}
       </View>
 
-      {/* Title and Description */}
+      {/* Video Details */}
       <View style={styles.videoDetails}>
-        {isVideoEnded &&!isQuizSubmit && (
+        {isVideoEnded && !isQuizSubmit && (
           <View style={styles.quizIncomplete}>
             <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
           </View>
@@ -194,52 +180,20 @@ export default function VideoScreen() {
         <FlatList
           data={videoData}
           renderItem={renderRecommendedItem}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           showsVerticalScrollIndicator={false}
         />
       </View>
 
-      {/**quiz modal */}
-
-      <Modal
-        animationType='slide'
-        transparent={true}
-        visible={isQuizModal}
-        onRequestClose={closeQuizModal}
-      >
-        <View style={styles.modalView}>
-          <Text style={styles.modaltxt}>Quiz Question</Text>
-          <FlatList
-            data={quizQuestion}
-            renderItem={renderQuestionItem}
-            keyExtractor={(item, index) => index.toString()}
-            style={styles.flatList}
-          />
-
-          <TouchableOpacity style={styles.submitQuizbtn} onPress={submitQuiz}>
-            <Text style={styles.submitQuizTxt}>Submit Quiz</Text>
-          </TouchableOpacity>
-        </View>
-      </Modal>
-
-      {/* Comments Section */}
-      <View style={styles.commentSection}>
-        <Text style={styles.sectionTitle}>Comments</Text>
-        <TextInput
-          style={styles.commentInput}
-          value={comment}
-          onChangeText={(text) => setComment(text)}
-          placeholder="Add a comment..."
-        />
-        <TouchableOpacity style={styles.submitButton} onPress={submitComment}>
-          <Text style={styles.submitButtonText}>Post Comment</Text>
-        </TouchableOpacity>
-        <FlatList
-          data={comments}
-          renderItem={renderComment}
-          keyExtractor={(item, index) => index.toString()}
-        />
-      </View>
+      {/* Quiz Modal */}
+      <QuizModal
+        isVisible={isQuizModal}
+        questions={quizQuestion}
+        onClose={closeQuizModal}
+        onSubmit={submitQuiz}
+        selectedAnswers={selectedAnswer}
+        setSelectedAnswer={setSelectedAnswer}
+      />
     </ScrollView>
   );
 }
@@ -255,7 +209,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative'
+    position: 'relative',
   },
   video: {
     width: '100%',
@@ -305,87 +259,20 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 15,
+  },
 
-  },
-  modalView: {
-    marginTop: 20,
-    backgroundColor: 'white',
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginHorizontal: 20,
-    borderRadius: 8,
-    elevation: 5,
-    flex:1
-  },
-  // flatlist:{
-  //   maxHeight:300
-  // },
-  modaltxt: {
-    fontSize: 18,
-    marginBottom: 20,
-    color:'#000'
-  },
-  quesContainer:{
-    marginBottom:20,
-    
-  },
-  quesText:{
-    fontSize:18,
-    fontWeight:'bold',
-    marginBottom:10
-  },
-  optionContainer:{
-    flexDirection:'row',
-    alignItems:'center',
-    marginVertical:5,
-    
-  },
-  radioCircle:{
-    height:24,
-    width:24,
-    borderRadius:12,
-    borderWidth:2,
-    borderColor:'#888',
-    alignItems:'center',
-    justifyContent:'center',
-    marginRight:10,
-  },
-  selectedRadioCircle:{
-    borderColor:'#ffc100',
-  },
-  radioInnerCircle:{
-    height:12,
-    width:12,
-    borderRadius:10,
-    backgroundColor:'#ffc100',
-  },
-  optionText:{
-    fontSize:16,
-    color:'#000'
-  },
-  quizIncomplete:{
-    marginBottom:10,
-    padding:10,
-    backgroundColor:'#ffcccc',
-    borderRadius:8,
-  },
-  incompleteTxt:{
-    fontSize:16,
-    fontWeight:'bold',
-    color:'#d9534f',
-    textAlign:'center'
-  },
-  submitQuizbtn: {
-    backgroundColor: 'black',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+  //modal
+  quizIncomplete: {
+    marginBottom: 10,
+    padding: 10,
+    backgroundColor: '#ffcccc',
     borderRadius: 8,
   },
-  submitQuizTxt: {
-    color: '#fff',
+  incompleteTxt: {
+    fontSize: 16,
     fontWeight: 'bold',
-    fontSize: 16
+    color: '#d9534f',
+    textAlign: 'center',
   },
   recommendText: {
     fontSize: 16,
@@ -403,8 +290,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderWidth: 1,
     borderRadius: 25,
-    transform: [{ translateX: -50 }],
-    shadowColor: '#000', // Add shadow for depth
+    transform: [{translateX: -50}],
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
@@ -412,40 +299,5 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3.84,
     elevation: 5,
-  },
-  commentSection: {
-    padding: 15,
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-  },
-  commentInput: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    padding: 10,
-    marginBottom: 10,
-    fontSize: 16,
-  },
-  submitButton: {
-    backgroundColor: '#007BFF',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignSelf: 'flex-start',
-    marginBottom: 20,
-  },
-  submitButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  commentContainer: {
-    padding: 10,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  commentText: {
-    fontSize: 16,
-    color: '#333',
   },
 });

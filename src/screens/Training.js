@@ -16,11 +16,11 @@ import { useAuth } from '../security/AuthContext';
 
 
 const categories = [
-  { name: 'Art', image: require('../../assets/logo/arts.png') },
-  { name: 'Coding', image: require('../../assets/logo/code.png') },
-  { name: 'Marketing', image: require('../../assets/logo/marketing.png') },
-  { name: 'Business', image: require('../../assets/logo/business.png') },
-  { name: 'Accounting', image: require('../../assets/logo/marketing.png') },
+  { name: 'Art', image: require('../assets/logo/arts.png') },
+  { name: 'Coding', image: require('../assets/logo/code.png') },
+  { name: 'Marketing', image: require('../assets/logo/marketing.png') },
+  { name: 'Business', image: require('../assets/logo/business.png') },
+  { name: 'Accounting', image: require('../assets/logo/marketing.png') },
 ];
 
 
@@ -30,21 +30,21 @@ const popularCourses = [
     title: 'Design Thinking Fundamentals',
     instructor: 'Robert Green',
     price: '$180.00',
-    image: require('../../assets/logo/course.jpg'),
+    image: require('../assets/logo/course.jpg'),
   },
   {
     id: '2',
     title: 'Advanced React Native',
     instructor: 'Sarah Smith',
     price: '$200.00',
-    image: require('../../assets/logo/course.jpg'), 
+    image: require('../assets/logo/course.jpg'), 
   },
   {
     id: '3',
     title: 'Introduction to Marketing',
     instructor: 'Michael Johnson',
     price: '$150.00',
-    image: require('../../assets/logo/course.jpg'), 
+    image: require('../assets/logo/course.jpg'), 
   },
 ];
 
@@ -68,7 +68,7 @@ export default function Training({ navigation }) {
       {/* Header Section */}
       <ImageBackground
         style={styles.imgback}
-        source={require('../../assets/logo/bg1.jpg')}
+        source={require('../assets/logo/bg1.jpg')}
       >
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Hi, ALEX</Text>
@@ -122,7 +122,7 @@ export default function Training({ navigation }) {
           <View style={styles.orgRecommendItem}>
             <Image
               style={styles.recommendImage}
-              source={require('../../assets/logo/course.jpg')}
+              source={require('../assets/logo/course.jpg')}
             />
             <Text style={styles.orgRecommendText}>Encora Unity Basic Course</Text>
             <TouchableOpacity style={styles.progressContainer} >
@@ -136,7 +136,7 @@ export default function Training({ navigation }) {
           <View style={styles.orgRecommendItems}>
             <Image
               style={styles.recommendImage}
-              source={require('../../assets/logo/course1.jpg')}
+              source={require('../assets/logo/course1.jpg')}
             />
             <Text style={styles.orgRecommendText}>Kubernetes Assessment</Text>
             <TouchableOpacity style={styles.progressContainer} >
@@ -197,7 +197,7 @@ export default function Training({ navigation }) {
              
                   <Image
                     style={styles.designicon}
-                    source={require('../../assets/logo/layers.png')}
+                    source={require('../assets/logo/layers.png')}
                   />
                 </View>
               </View>
@@ -211,7 +211,7 @@ export default function Training({ navigation }) {
                 <Text style={styles.recommendSubText}>17 Courses</Text>
                 <Image
                     style={styles.designicon}
-                    source={require('../../assets/logo/layers.png')}
+                    source={require('../assets/logo/layers.png')}
                   />
               </View>
             </View>

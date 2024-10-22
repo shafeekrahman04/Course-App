@@ -47,7 +47,7 @@ export default function SplashScreen({ navigation }) {
     <View style={styles.body}>
       <View style={styles.image_container}>
         <Image
-          source={require('../../assets/logo/react-logo.png')}
+          source={require('../assets/logo/react-logo.png')}
           style={styles.image}
         />
       </View>
