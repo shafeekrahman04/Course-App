@@ -11,6 +11,7 @@ import {
 import React from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useAuth } from '../security/AuthContext';
 
 const videoData = [
   {
@@ -60,6 +61,8 @@ const videoData = [
 ];
 
 export default function Home({navigation}) {
+
+  const authContext = useAuth();
   const openVideo = videoUri => {
     navigation.navigate('VideoScreen', {videoUri});
   };
