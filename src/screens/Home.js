@@ -1,256 +1,218 @@
-import React from 'react';
 import {
   View,
   Text,
+  TextInput,
   StyleSheet,
   Image,
   ScrollView,
   TouchableOpacity,
-  TextInput,
-  FlatList,
   ImageBackground,
- 
 } from 'react-native';
+import React from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { useAuth } from '../security/AuthContext';
 
-
-const categories = [
-  { name: 'Art', image: require('../assets/logo/arts.png') },
-  { name: 'Coding', image: require('../assets/logo/code.png') },
-  { name: 'Marketing', image: require('../assets/logo/marketing.png') },
-  { name: 'Business', image: require('../assets/logo/business.png') },
-  { name: 'Accounting', image: require('../assets/logo/marketing.png') },
-];
-
-
-const popularCourses = [
+const videoData = [
   {
     id: '1',
-    title: 'Design Thinking Fundamentals',
-    instructor: 'Robert Green',
-    price: '$180.00',
-    image: require('../assets/logo/course.jpg'),
+    title: 'Voice on Security: USB Drop',
+    description: 'Learn about the risks of USB drops.',
+    videoUrl:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/video%2FWhatsApp%20Video%202024-09-13%20at%205.25.47%20PM.mp4?alt=media&token=712f3f73-9b61-4c5a-97e9-7081dc161e33',
+    thumbnailUrl:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
   },
   {
     id: '2',
-    title: 'Advanced React Native',
-    instructor: 'Sarah Smith',
-    price: '$200.00',
-    image: require('../assets/logo/course.jpg'), 
+    title: 'The Threat of Free WiFi',
+    description: 'Understand the risks of public WiFi.',
+    thumbnailUrl:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
   },
   {
     id: '3',
-    title: 'Introduction to Marketing',
-    instructor: 'Michael Johnson',
-    price: '$150.00',
-    image: require('../assets/logo/course.jpg'), 
+    title: 'Cybersecurity Essentials',
+    description: 'Basic cybersecurity tips everyone should know.',
+    thumbnailUrl:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-3.png?alt=media&token=42b8ef40-cdaa-45e2-b8e1-df0454163369',
+  },
+  {
+    id: '4',
+    title: 'Data Privacy Basics',
+    description: 'Protecting your personal data.',
+    thumbnailUrl:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-4.webp?alt=media&token=b73d88fa-55e4-47dd-9190-04d6962d76ff',
+  },
+  {
+    id: '5',
+    title: 'Encora Unity Basic Course',
+    description: 'Essentials of Unity game development',
+    thumbnailUrl:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
+  },
+  {
+    id: '6',
+    title: 'Encora Unity Basic Course',
+    description: 'Essentials of Unity game development',
+    thumbnailUrl:
+      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
   },
 ];
 
-export default function Home({ navigation }) {
-  const authContext = useAuth();
-
-  const openVideo = (videoUri) => {
-    navigation.navigate('VideoScreen', { videoUri });
+export default function Home({navigation}) {
+  const openVideo = videoUri => {
+    navigation.navigate('VideoScreen', {videoUri});
   };
 
   function logoutHandler() {
     authContext.logout();
-    navigation.navigate("Login");
+    navigation.navigate('Login');
   }
 
   return (
-
-    <ScrollView style={styles.container}
-      contentContainerStyle={{ paddingBottom: 20 }}
-    >
-      {/* Header Section */}
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{paddingBottom: 20}}>
+      {/* Header */}
       <ImageBackground
         style={styles.imgback}
-        source={require('../assets/logo/bg1.jpg')}
-      >
+        source={require('../assets/logo/bg1.jpg')}>
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Hi, ALEX</Text>
           <Text style={styles.subText}>Let's start learning!</Text>
           <TouchableOpacity style={styles.notificationIcon}>
-            <Icon name="notifications-outline" size={25} color="#000"/>
+            <Icon name="notifications-outline" size={25} color="#000" />
           </TouchableOpacity>
           <TouchableOpacity style={styles.notificationIcon}>
-            <Icon name="log-out-outline" size={25} color="#000" onPress={logoutHandler}/>
+            <Icon
+              name="log-out-outline"
+              size={25}
+              color="#000"
+              onPress={logoutHandler}
+            />
           </TouchableOpacity>
         </View>
       </ImageBackground>
+
       {/* Search Bar */}
 
       <View style={styles.searchContainer}>
-        <Icon name="search-outline" size={20} color="#777" style={styles.searchicon} />
+        <Icon
+          name="search-outline"
+          size={20}
+          color="#777"
+          style={styles.searchicon}
+        />
         <TextInput style={styles.searchInput} placeholder="Search" />
       </View>
 
-      {/* Categories Section */}
-      <View>
-        <View style={styles.seeallbtn}>
-          <Text style={styles.sectionTitle}>Categories</Text>
-          <TouchableOpacity style={styles.seeAllButton}>
-            <Text style={styles.seeAllText}>See All</Text>
-          </TouchableOpacity>
-        </View>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
-          {categories.map((category) => (
+      {/*Latest Learned*/}
+      <View style={styles.section}>
+        <View>
+          <Text style={styles.sectionTitle}>Latest Learned</Text>
+          <View>
             <TouchableOpacity
-              style={styles.categoryItem}
-              key={category.name}>
-              <View style={styles.categoryIconWrapper}>
-                <Image source={category.image} style={styles.categoryImage} />
+              onPress={() =>
+                openVideo(
+                  'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/video%2FWhatsApp%20Video%202024-09-13%20at%205.25.47%20PM.mp4?alt=media&token=712f3f73-9b61-4c5a-97e9-7081dc161e33',
+                )
+              }>
+              <View style={styles.latestlearned}>
+                <Image
+                  style={styles.learnImg}
+                  source={{
+                    uri: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
+                  }}
+                  blurRadius={5}
+                />
+                <View style={styles.learnedOverlay}>
+                  <Text style={styles.learnedTitle}>
+                    Road to Javascript Expert
+                  </Text>
+                  <Text style={styles.learnedSubtitle}>
+                    Part 1 • 20 Minutes
+                  </Text>
+                </View>
+                <View style={styles.playButton}>
+                  <Ionicons name="play" size={25} color="grey" />
+                </View>
               </View>
-              <Text style={styles.categoryText}>{category.name}</Text>
             </TouchableOpacity>
-          ))}
+          </View>
+        </View>
+      </View>
+
+      {/* Latest Video */}
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Latest Video</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={styles.recommendations}>
+            {videoData.map(item => (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => openVideo(item.videoUrl)}>
+                <View style={styles.recommendItem}>
+                  <Image
+                    style={styles.recommendImage}
+                    source={{uri: item.thumbnailUrl}}
+                  />
+                  <Text style={styles.recommendText}>{item.title}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         </ScrollView>
       </View>
 
-      {/* Continue Learning */}
-      <View style={styles.seeallbtn}>
-        <Text style={styles.sectionTitle}>Continue Learning</Text>
-        <TouchableOpacity style={styles.seeAllButton}>
-          <Text style={styles.seeAllText}>See All</Text>
-        </TouchableOpacity>
-      </View>
+      {/* Watched Video */}
+
       <View style={styles.section}>
-        <View style={styles.orgRecommendations}>
-          <View style={styles.orgRecommendItem}>
-            <Image
-              style={styles.recommendImage}
-              source={require('../assets/logo/course.jpg')}
-            />
-            <Text style={styles.orgRecommendText}>Encora Unity Basic Course</Text>
-            <TouchableOpacity style={styles.progressContainer} >
-              <View style={styles.progressCircle}>
-                <View style={styles.innerCircle}>
-                  <Icon name="play" size={20} color="grey" />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.orgRecommendItems}>
-            <Image
-              style={styles.recommendImage}
-              source={require('../assets/logo/course1.jpg')}
-            />
-            <Text style={styles.orgRecommendText}>Kubernetes Assessment</Text>
-            <TouchableOpacity style={styles.progressContainer} >
-              <View style={styles.progressCircle}>
-                <View style={styles.innerCircle}>
-                  <Icon name="play" size={20} color="grey" />
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </View>
-
-      {/* Popular Courses */}
-      <View style={styles.seeallbtn}>
-        <Text style={styles.sectionTitle}>Popular Courses</Text>
-        <TouchableOpacity style={styles.seeAllButton}>
-          <Text style={styles.seeAllText}>See All</Text>
-        </TouchableOpacity>
-      </View>
-      <FlatList
-        data={popularCourses}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-
-          <TouchableOpacity onPress={() => openVideo('https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/video%2FWhatsApp%20Video%202024-09-13%20at%205.25.47%20PM.mp4?alt=media&token=712f3f73-9b61-4c5a-97e9-7081dc161e33')} style={styles.courseCard}>
-            <Image source={item.image} style={styles.courseImage} />
-            <View style={styles.courseInfo}>
-              <Text style={styles.courseTitle}>{item.title}</Text>
-              <Text style={styles.courseInstructor}>{item.instructor}</Text>
-              <Text style={styles.coursePrice}>{item.price}</Text>
-            </View>
-          </TouchableOpacity>
-        )}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.courseList}
-      />
-
-      {/* Recommended for you*/}
-      <View style={styles.seeallbtn}>
-        <Text style={styles.sectionTitle}>Recommended for You</Text>
-        <TouchableOpacity style={styles.seeAllButton}>
-          <Text style={styles.seeAllText}>See All</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Watched Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.recommendations}>
-            {/* First Card */}
-            <TouchableOpacity onPress={() => openVideo('your_video_url_here')}>
-              <View style={styles.recommendItem}>
-
-          
-                <Text style={styles.recommendText}>Graphic Design Training</Text>
-                <View style={styles.recommandimg}>
-                  <Text style={styles.recommendSubText}>3 Courses</Text>
-             
+            {videoData.map(item => (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => openVideo(item.videoUrl)}>
+                <View style={styles.recommendItem}>
                   <Image
-                    style={styles.designicon}
-                    source={require('../assets/logo/layers.png')}
+                    style={styles.recommendImage}
+                    source={{uri: item.thumbnailUrl}}
                   />
+                  <Text style={styles.recommendText}>{item.title}</Text>
                 </View>
-              </View>
-            </TouchableOpacity>
-            {/* Add other recommendation cards*/}
-            <View style={styles.recommendItem}>
-
-
-                <Text style={styles.recommendText}>Mobile Application</Text>
-                <View style={styles.recommandimg}>
-                <Text style={styles.recommendSubText}>17 Courses</Text>
-                <Image
-                    style={styles.designicon}
-                    source={require('../assets/logo/layers.png')}
-                  />
-              </View>
-            </View>
+              </TouchableOpacity>
+            ))}
           </View>
         </ScrollView>
       </View>
     </ScrollView>
-
   );
 }
 
 const styles = StyleSheet.create({
-  imgback: {
-    padding: 16, 
-    flex: 1,
-    resizeMode: 'cover',
-    borderBottomLeftRadius: 30, 
-    borderBottomRightRadius: 30,
-    overflow: 'hidden',
-    height: 120
-  },
   container: {
-    // flex: 1,
+    flex: 1,
     backgroundColor: '#f9f9f9',
     padding: 16,
     margin: 0,
     padding: 0,
-
   },
-  seeallbtn: {
+  imgback: {
+    padding: 16,
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginLeft: 10,
-    marginRight: 10,
+    resizeMode: 'cover',
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    overflow: 'hidden',
+    height: 120,
   },
-  seeAllText: {
-    color: '#ffc200'
+  title: {
+    fontSize: 30,
+    color: '#888',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   header: {
     flexDirection: 'row',
@@ -280,7 +242,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
@@ -291,169 +253,87 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   searchicon: {
-    marginLeft: 10
+    marginLeft: 10,
+  },
+
+  //learn
+  learnImg: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+  },
+  learnedOverlay: {
+    position: 'absolute',
+    left: 20,
+    bottom: 10,
+  },
+  learnedTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingBottom: 5,
+  },
+  learnedSubtitle: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  playButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 10,
+    backgroundColor: 'white',
+    borderRadius: 25,
+    padding: 10,
+    marginLeft: 15,
+    borderColor: '#ffc100',
+    borderWidth: 2,
+  },
+  searchInput: {
+    marginLeft: 10,
+    flex: 1,
+    color: '#000',
+  },
+
+  //
+  section: {
+    padding: 15,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginVertical: 20,
-  },
-  categoryContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-  },
-  categoryItem: {
-    alignItems: 'center',
-    marginRight: 20,
-  },
-  categoryIconWrapper: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  categoryImage: {
-    width: 40,
-    height: 40,
-    resizeMode: 'contain',
-  },
-  categoryText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  courseCard: {
-    flexDirection: 'column',
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 5,
-    marginRight: 16, 
-    width: 250, 
-    height: 250,
-  },
-  courseImage: {
-    width: '100%',
-    height: 145,
-    borderRadius: 10,
-  },
-  courseInfo: {
-    padding: 10, 
-  },
-  courseTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  courseInstructor: {
     color: '#888',
-    marginTop: 4,
+    marginBottom: 30,
   },
-  coursePrice: {
-    color: '#4CAF50',
+
+  //latest
+  recommendations: {
+    flexDirection: 'row',
+  },
+  recommendItem: {
+    width: 200,
+    marginRight: 10,
+  },
+  recommendImage: {
+    width: '100%',
+    height: 120,
+    borderRadius: 8,
+  },
+  recommendText: {
+    marginTop: 5,
+    fontSize: 14,
+    color: '#000',
     fontWeight: 'bold',
-    marginTop: 8,
   },
   orgRecommendations: {
-    flexDirection: 'column', 
-    justifyContent: 'center',
-        alignItems: 'center', 
-    margin: 10,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   orgRecommendItem: {
-    width: '100%',
-    alignItems: 'center', 
-    marginBottom: 10, 
-    flexDirection: 'row',
-    backgroundColor: '#FEF9D9',
-    borderRadius: 20,
-
-  },
-  orgRecommendItems: {
-    width: '100%',
-    alignItems: 'center', 
-    marginBottom: 10,
-    flexDirection: 'row',
-    backgroundColor: '#E5D9F2',
-    borderRadius: 20,
-
+    width: '48%',
   },
   orgRecommendText: {
     color: '#000',
     fontWeight: 'bold',
     textAlign: 'center',
-    marginLeft: 10
-  },
-  recommendImage: {
-    width: '30%',
-    height: 100,
-    borderRadius: 10,
-  },
-  courseList: {
-    paddingLeft: 10,
-    paddingBottom: 20,
-  },
-  progressContainer: {
-    marginTop: 10,
-    padding: 10,
-  },
-  progressCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#ffc100',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'white'
-  },
-  innerCircle: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 4
-  },
-  sectionTitles: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  recommendations: {
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-  },
-  recommendItem: {
-    flexDirection: 'column',
-    backgroundColor: '#FDCEDF', 
-    borderRadius: 15,
-    padding: 20,
-    marginRight: 16,
-  
-    width: 220,
-    
-    textAlign:'left'
-  },
-  recommandimg: {
-    flexDirection: 'row',
-    flex:1,
-    justifyContent:'space-between'
-  },
-  designicon: {
-    width: 40, 
-    height: 40,
-  },
-  recommendText: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: '#333',
-
-  },
-  recommendSubText: {
-    fontSize: 12,
-    color: '#777', 
-paddingTop:'5%'
   },
 });
