@@ -1,10 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-export default function Messages() {
+export default function Quiz() {
   return (
     <View>
-      <Text>Messages</Text>
+      <Text>Quiz</Text>
     </View>
   )
 }

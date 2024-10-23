@@ -3,9 +3,9 @@ import React from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import Profile from '../screens/Profile';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import Training from '../screens/Training';
+import Home from '../screens/Home';
 import Library from '../screens/Library';
-import Messages from '../screens/Messages';
+import Quiz from '../screens/Quiz';
 
 export default function BottomTab() {
   const TabNav = createBottomTabNavigator();
@@ -16,23 +16,23 @@ export default function BottomTab() {
         tabBarInactiveTintColor: 'grey',
         tabBarLabelStyle: {
           fontWeight: '600',
-          fontSize: 16, // Increased font size
+          fontSize: 16,
         },
         tabBarStyle: {
-          height: 70, // Increased height of the bottom tab bar
+          height: 70,
           paddingBottom: 10,
           paddingTop: 10,
         },
       }}>
       <TabNav.Screen
-        name="Training"
-        component={Training}
+        name="Home"
+        component={Home}
         options={{
           headerShown: false,
           tabBarIcon: ({focused}) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
-              size={21} // Increased icon size
+              size={21}
               color={focused ? '#0163d2' : 'grey'}
             />
           ),
@@ -46,21 +46,21 @@ export default function BottomTab() {
           tabBarIcon: ({focused}) => (
             <Ionicons
               name={focused ? 'search' : 'search-outline'}
-              size={21} // Increased icon size
+              size={21}
               color={focused ? '#0163d2' : 'grey'}
             />
           ),
         }}
       />
       <TabNav.Screen
-        name="Messages"
-        component={Messages}
+        name="Quiz"
+        component={Quiz}
         options={{
           headerShown: false,
           tabBarIcon: ({focused}) => (
             <Ionicons
-              name={focused ? 'mail' : 'mail-outline'}
-              size={21} // Increased icon size
+              name={focused ? 'school' : 'school-outline'}
+              size={21}
               color={focused ? '#0163d2' : 'grey'}
             />
           ),
@@ -74,7 +74,7 @@ export default function BottomTab() {
           tabBarIcon: ({focused}) => (
             <Ionicons
               name={focused ? 'person' : 'person-outline'}
-              size={21} // Increased icon size
+              size={21}
               color={focused ? '#0163d2' : 'grey'}
             />
           ),

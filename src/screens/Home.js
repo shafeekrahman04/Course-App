@@ -48,7 +48,7 @@ const popularCourses = [
   },
 ];
 
-export default function Training({ navigation }) {
+export default function Home({ navigation }) {
   const authContext = useAuth();
 
   const openVideo = (videoUri) => {
