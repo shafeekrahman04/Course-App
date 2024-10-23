@@ -9,6 +9,7 @@ import VideoScreen from '../screens/VideoScreen';
 import OnboardingScreen from '../screens/OnBoarding';
 import { useAuth } from '../security/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
+import QuizModal from '../modal/QuizModal';
 
 const Stack = createStackNavigator();
 
@@ -71,6 +72,13 @@ export default function StackNavigation() {
         <Stack.Screen
           name="VideoScreen"
           component={VideoScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+         <Stack.Screen
+          name="QuizModal"
+          component={QuizModal}
           options={{
             headerShown: false,
           }}
