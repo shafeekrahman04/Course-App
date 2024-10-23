@@ -7,73 +7,74 @@ import LoginScreen from '../screens/LoginScreen';
 import BottomTab from './BottomTab';
 import VideoScreen from '../screens/VideoScreen';
 import OnboardingScreen from '../screens/OnBoarding';
-import { useAuth } from '../security/AuthContext';
 import SplashScreen from '../screens/SplashScreen';
 
 const Stack = createStackNavigator();
 
 export default function StackNavigation() {
-  const {isFresh} = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isFresh, setIsFresh] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check AsyncStorage for authentication status
-    const checkAuthentication = async () => {
+    const checkAsyncStorage = async () => {
       try {
         const authStatus = await AsyncStorage.getItem('isAuthenticated');
-        setIsAuthenticated(authStatus === 'true');
+        setIsAuthenticated(authStatus === 'true' ? true: false);
+        const freshStatus = await AsyncStorage.getItem('isFresh');
+        setIsFresh(freshStatus === 'false' ? false: true);
       } catch (error) {
-        console.log('Error checking auth status:', error);
+        console.error('Error checking status:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuthentication();
+    checkAsyncStorage();
   }, []);
 
-  // if (isLoading) {
-  //   return <SplashScreen />;
-  // }
+  if (isLoading) {
+    return <SplashScreen />;
+  }
+
+  let initialRouteName;
+
+  if (isFresh === true) {
+    initialRouteName = 'Onboarding';
+  } else if (isFresh === false) {
+    initialRouteName = isAuthenticated ? 'HomeTab' : 'Login';
+  } else {
+    // If isFresh is null (not yet determined), assume Onboarding
+    initialRouteName = 'Onboarding';
+  }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isLoading ? 'Splash' : isAuthenticated ? 'HomeTab' : isFresh ? 'Onboarding' : 'Login'}>
-        {!isAuthenticated && isFresh && (
-          <Stack.Screen
-            name="Onboarding"
-            component={OnboardingScreen}
-            options={{headerShown: false}}
-          />
-        )}
+      <Stack.Navigator initialRouteName={initialRouteName}>
         <Stack.Screen
           name="Splash"
           component={SplashScreen}
-          options={{
-            headerShown: false,
-          }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="Login"
           component={LoginScreen}
-          options={{
-            headerShown: false,
-          }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="HomeTab"
           component={BottomTab}
-          options={{
-            headerShown: false,
-          }}
+          options={{headerShown: false}}
         />
         <Stack.Screen
           name="VideoScreen"
           component={VideoScreen}
-          options={{
-            headerShown: false,
-          }}
+          options={{headerShown: false}}
+        />
+        <Stack.Screen
+          name="Onboarding"
+          component={OnboardingScreen}
+          options={{headerShown: false}}
         />
       </Stack.Navigator>
     </NavigationContainer>
