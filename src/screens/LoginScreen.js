@@ -73,7 +73,7 @@ export default function LoginScreen({navigation}) {
     <View style={styles.body}>
       <View style={styles.image_container}>
         <Image
-          source={require('../../assets/logo/loginimg.jpg')}
+          source={require('../assets/logo/loginimg.jpg')}
           style={styles.image}
         />
       </View>

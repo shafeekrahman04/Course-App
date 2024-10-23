@@ -3,15 +3,17 @@ import React, {useState, useEffect} from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import SpalshScreen from '../screens/SpalshScreen';
 import LoginScreen from '../screens/LoginScreen';
 import BottomTab from './BottomTab';
 import VideoScreen from '../screens/VideoScreen';
 import OnboardingScreen from '../screens/OnBoarding';
+import { useAuth } from '../security/AuthContext';
+import SplashScreen from '../screens/SplashScreen';
 
 const Stack = createStackNavigator();
 
 export default function StackNavigation() {
+  const {isFresh} = useAuth();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,14 +33,14 @@ export default function StackNavigation() {
     checkAuthentication();
   }, []);
 
-  if (isLoading) {
-    return <SpalshScreen />;
-  }
+  // if (isLoading) {
+  //   return <SplashScreen />;
+  // }
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={isAuthenticated ? 'HomeTab' : 'Onboarding'}>
-        {!isAuthenticated && (
+      <Stack.Navigator initialRouteName={isLoading ? 'Splash' : isAuthenticated ? 'HomeTab' : isFresh ? 'Onboarding' : 'Login'}>
+        {!isAuthenticated && isFresh && (
           <Stack.Screen
             name="Onboarding"
             component={OnboardingScreen}
@@ -47,7 +49,7 @@ export default function StackNavigation() {
         )}
         <Stack.Screen
           name="Splash"
-          component={SpalshScreen}
+          component={SplashScreen}
           options={{
             headerShown: false,
           }}
