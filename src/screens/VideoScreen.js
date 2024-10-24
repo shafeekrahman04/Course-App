@@ -54,6 +54,7 @@ export default function VideoScreen({navigation}) {
     Orientation.addOrientationListener(handleOrientation);
     return () => {
       Orientation.removeOrientationListener(handleOrientation);
+      Orientation.unlockAllOrientations();
     };
   }, []);
 
@@ -139,121 +140,134 @@ export default function VideoScreen({navigation}) {
   };
 
   return (
-    <ScrollView style={styles.container}>
+    <>
+    {!fullscreen && (
       <ImageBackground
         style={styles.imgback}
-        source={require('../assets/logo/bg1.jpg')}>
+        source={require('../assets/logo/bg1.jpg')}
+      >
+
         <View style={styles.header}>
+
           <TouchableOpacity onPress={goBack} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color="#333" />
+            <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.title}>{currentVideo.title}</Text>
+
+          <Text style={styles.title}>{currentVideo.title} </Text>
+         
         </View>
+
       </ImageBackground>
-
-      <View
-        style={fullscreen ? styles.fullscreenContainer : styles.videoContainer}>
-        <TouchableOpacity onPress={handleControls}>
-          <Video
-            ref={videoRef}
-            source={{uri: currentVideo.uri}}
-            style={fullscreen ? styles.fullscreenVideo : styles.video}
-            controls={false}
-            resizeMode={'contain'}
-            paused={!isPlaying}
-            onLoad={onLoadEnd}
-            onProgress={onProgress}
-            onEnd={handleVideoEnd}
-            onError={handleVideoError}
-          />
-
-          {showControl && (
-            <View style={styles.controlOverlay}>
-              <TouchableOpacity
-                onPress={handleFullscreen}
-                style={styles.fullscreenButton}>
-                {fullscreen ? <FullscreenClose /> : <FullscreenOpen />}
-              </TouchableOpacity>
-
-              <TouchableOpacity onPress={goBack} style={styles.videoBackButton}>
-                <VideoBack />
-              </TouchableOpacity>
-
-              <PlayerControls
-                onPlay={handlePlayPause}
-                onPause={handlePlayPause}
-                playing={isPlaying}
-                skipBackwards={() => onSeek(currentTime - 15)}
-                skipForwards={() => onSeek(currentTime + 15)}
+    )}
+    <FlatList
+      style={styles.container}
+      data={[]}
+      keyExtractor={(item, index) => index.toString()}
+      ListHeaderComponent={
+        <>
+          {/* Video Player and Controls */}
+          <View style={fullscreen ? styles.fullscreenContainer : styles.videoContainer}>
+            <TouchableOpacity onPress={handleControls}>
+              <Video
+                ref={videoRef}
+                source={{ uri: currentVideo.uri }}
+                style={fullscreen ? styles.fullscreenVideo : styles.video}
+                controls={false}
+                resizeMode={'contain'}
+                paused={!isPlaying}
+                onLoad={onLoadEnd}
+                onProgress={onProgress}
+                onEnd={handleVideoEnd}
+                onError={handleVideoError}
               />
+              {showControl && (
+                <View style={styles.controlOverlay}>
+                  <TouchableOpacity
+                    onPress={handleFullscreen}
+                    style={styles.fullscreenButton}>
+                    {fullscreen ? <FullscreenClose /> : <FullscreenOpen />}
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={goBack} style={styles.videoBackButton}>
+                    <VideoBack />
+                  </TouchableOpacity>
+                  <PlayerControls
+                    onPlay={handlePlayPause}
+                    onPause={handlePlayPause}
+                    playing={isPlaying}
+                    skipBackwards={() => onSeek(currentTime - 15)}
+                    skipForwards={() => onSeek(currentTime + 15)}
+                  />
+                  <ProgressBar
+                    currentTime={currentTime}
+                    duration={duration > 0 ? duration : 0}
+                    onSlideCapture={onSeek}
+                  />
+                </View>
+              )}
+            </TouchableOpacity>
+            {isQuizButton && !isQuizSubmit && (
+              <TouchableOpacity style={styles.quizButton} onPress={() => setIsQuizModal(true)}>
+                <Text style={styles.quizbtnText}>Take the Quiz</Text>
+              </TouchableOpacity>
+            )}
+          </View>
 
-              <ProgressBar
-                currentTime={currentTime}
-                duration={duration > 0 ? duration : 0}
-                onSlideCapture={onSeek}
+          {/* Video Details */}
+          <View style={styles.videoDetails}>
+            {isVideoEnded && !isQuizSubmit && (
+              <View style={styles.quizIncomplete}>
+                <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
+              </View>
+            )}
+
+            <Text style={styles.videoDescription}>{currentVideo.description}</Text>
+          </View>
+        </>
+      }
+      ListFooterComponent={
+        <>
+          {/* Recommended Videos */}
+          {!fullscreen && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Recommended Videos</Text>
+              <FlatList
+                data={videoData}
+                renderItem={({ item }) => (
+                  <TouchableOpacity  onPress={() => playVideo(item)}>
+          <View style={styles.recommendItem}>
+            <View style={styles.imageContainer}>
+              <Image
+                style={styles.recommendImage}
+                source={{uri: item.thumbnailUrl}}
+              />
+              <TouchableOpacity
+                style={styles.playCircleContainer}
+                onPress={() => playVideo(item)}>
+                <View style={styles.playCircle}>
+                  <Ionicons name="play" size={25} color="white" />
+                </View>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.recommendDetails}>
+              <Text style={styles.recommendText}>{item.title}</Text>
+              <Text style={styles.recommendDescription}>
+                {item.description}
+              </Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+                )}
+                keyExtractor={(item) => item.id}
+                showsVerticalScrollIndicator={false}
               />
             </View>
           )}
-        </TouchableOpacity>
+        </>
+      }
+    />
+  </>
+);
 
-        {isQuizButton && !isQuizSubmit && (
-          <TouchableOpacity
-            style={styles.quizButton}
-            onPress={() => setIsQuizModal(true)}>
-            <Text style={styles.quizbtnText}>Take the Quiz</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      <View style={styles.videoDetails}>
-        {isVideoEnded && !isQuizSubmit && (
-          <View style={styles.quizIncomplete}>
-            <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
-          </View>
-        )}
-        <Text style={styles.videoTitle}>{currentVideo.title}</Text>
-        <Text style={styles.videoDescription}>{currentVideo.description}</Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recommended Videos</Text>
-        {videoData.map(item => (
-          <TouchableOpacity key={item.id} onPress={() => playVideo(item)}>
-            <View style={styles.recommendItem}>
-              <View style={styles.imageContainer}>
-                <Image
-                  style={styles.recommendImage}
-                  source={{uri: item.thumbnailUrl}}
-                />
-                <TouchableOpacity
-                  style={styles.playCircleContainer}
-                  onPress={() => playVideo(item)}>
-                  <View style={styles.playCircle}>
-                    <Ionicons name="play" size={25} color="white" />
-                  </View>
-                </TouchableOpacity>
-              </View>
-              <View style={styles.recommendDetails}>
-                <Text style={styles.recommendText}>{item.title}</Text>
-                <Text style={styles.recommendDescription}>
-                  {item.description}
-                </Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <QuizModal
-        isVisible={isQuizModal}
-        questions={quizQuestion}
-        onClose={() => setIsQuizModal(false)}
-        onSubmit={submitQuiz}
-        selectedAnswers={selectedAnswer}
-        setSelectedAnswer={setSelectedAnswer}
-      />
-    </ScrollView>
-  );
 }
 
 const styles = StyleSheet.create({
@@ -261,38 +275,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  // Header Styles
   imgback: {
-    padding: 15,
+    padding: 16,
+    resizeMode: 'cover',
+    // borderBottomLeftRadius: 30,
+    // borderBottomRightRadius: 30,
+    overflow: 'hidden',
     height: 70,
-    backgroundColor: '#f8f8f8',
-    flexDirection: 'row',
-    alignItems: 'center',
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    // marginBottom: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
+    // padding: 10,
+    marginTop: 7,
+    gap: 10
   },
-  backButton: {
+ backButton: {
     paddingHorizontal: 15,
   },
   title: {
-    fontSize: 20,
-    color: '#333',
+    fontSize: 18,
+    color: '#888',
     fontWeight: 'bold',
-    flex: 1,
     textAlign: 'center',
+    flex: 1,
   },
-  // video
   videoContainer: {
     width: Dimensions.get('window').width,
     height: 250,
@@ -364,16 +372,6 @@ const styles = StyleSheet.create({
     zIndex: 10, // Ensure the button is above other elements
     padding: 10,
   },
-  //recommended
-  section: {
-    padding: 15,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 10,
-  },
   //quiz
   quizbtnText: {
     color: '#fff',
@@ -412,11 +410,20 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
 
-  //Recommended
-  listContainer: {
+  //recommended
+  section: {
+    padding: 15,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#000',
+    marginBottom: 10,
+  },
+   listContainer: {
     padding: 10,
   },
-  recommendItem: {
+ recommendItem: {
     flexDirection: 'row',
     padding: 10,
     marginBottom: 10,
@@ -431,7 +438,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     marginHorizontal: 10,
   },
-  recommendImage: {
+ recommendImage: {
     width: 110,
     height: 120,
     borderRadius: 8,
@@ -441,7 +448,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     justifyContent: 'center',
   },
-  recommendText: {
+ recommendText: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
@@ -466,11 +473,6 @@ const styles = StyleSheet.create({
   imageContainer: {
     position: 'relative',
   },
-  recommendImage: {
-    width: 110,
-    height: 120,
-    borderRadius: 8,
-  },
   playCircleContainer: {
     position: 'absolute',
     top: 0,
@@ -488,4 +490,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  //quiz
+  // quizbtnText: {
+  //   color: '#fff',
+  //   fontWeight: 'bold',
+  //   fontSize: 15,
+  // },
+  // quizIncomplete: {
+  //   marginBottom: 10,
+  //   padding: 10,
+  //   backgroundColor: '#ffcccc',
+  //   borderRadius: 8,
+  // },
+  // incompleteTxt: {
+  //   fontSize: 16,
+  //   fontWeight: 'bold',
+  //   color: '#d9534f',
+  //   textAlign: 'center',
+  // },
+  // quizButton: {
+  //   position: 'absolute',
+  //   bottom: '15%',
+  //   left: '78%',
+  //   backgroundColor: 'rgba(128, 128, 128, 0.7)',
+  //   paddingVertical: 10,
+  //   borderColor: 'rgba(255, 255, 255, 0.8)',
+  //   paddingHorizontal: 15,
+  //   borderWidth: 1,
+  //   borderRadius: 25,
+  //   transform: [{ translateX: -50 }],
+  //   shadowColor: '#000',
+  //   shadowOffset: {
+  //     width: 0,
+  //     height: 2,
+  //   },
+  //   shadowOpacity: 0.3,
+  //   shadowRadius: 3.84,
+  //   elevation: 5,
+  // },
 });
