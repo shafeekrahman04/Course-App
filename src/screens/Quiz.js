@@ -2,10 +2,8 @@ import React from 'react';
 import {
   View,
   Text,
-  TextInput,
   StyleSheet,
   Image,
-  ScrollView,
   TouchableOpacity,
   ImageBackground,
   FlatList,
@@ -15,8 +13,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 
 // Sample quiz data
-
-
 
 const quizData = [
   {
@@ -48,7 +44,7 @@ const quizData = [
 export default function QuizScreen({ navigation }) {
 
   const openQuizForm = (quiz) => {
-    navigation.navigate('QuizModal', { quiz });
+    navigation.navigate('QuizDetails', { quiz });
   };
 
   const renderQuizItem = ({ item }) => (
@@ -86,12 +82,6 @@ export default function QuizScreen({ navigation }) {
         </View>
       </ImageBackground>
 
-      {/* Search bar */}
-      {/* <View style={styles.searchContainer}>
-        <Ionicons name="search-outline" size={20} color="#777" style={styles.searchicon} />
-        <TextInput style={styles.searchInput} placeholder="Search quizzes" />
-      </View> */}
-
       {/* List of quizzes */}
       <FlatList
         data={quizData}
@@ -127,9 +117,6 @@ const styles = StyleSheet.create({
   backButton: {
     position: 'absolute',
     left: 0,
-    // backgroundColor:'black',
-    // borderRadius:25,
-    // padding:2
   },
   title: {
     fontSize: 24,
@@ -169,13 +156,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: '#888',
     borderRadius: 20,
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 2 },
-    // shadowOpacity: 0.2,
-    // shadowRadius: 4,
-    // elevation: 5,
-    // borderBottomWidth: 1,
-    // borderBottomColor: '#ccc',
     marginHorizontal: 10,
     alignItems: 'center',
     borderWidth: 1,

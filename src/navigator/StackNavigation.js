@@ -8,7 +8,7 @@ import BottomTab from './BottomTab';
 import VideoScreen from '../screens/VideoScreen';
 import OnboardingScreen from '../screens/OnBoarding';
 import SplashScreen from '../screens/SplashScreen';
-import QuizModal from '../modal/QuizModal';
+import QuizDetails from '../modal/QuizDetails';
 
 const Stack = createStackNavigator();
 
@@ -78,8 +78,8 @@ export default function StackNavigation() {
           options={{headerShown: false}}
         />
         <Stack.Screen
-          name="QuizModal"
-          component={QuizModal}
+          name="QuizDetails"
+          component={QuizDetails}
           options={{
             headerShown: false,
           }}
