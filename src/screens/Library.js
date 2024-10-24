@@ -10,53 +10,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-const videoData = [
-  {
-    id: '1',
-    title: 'Voice on Security: USB Drop',
-    description: 'Learn about the risks of USB drops.',
-    videoUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/video%2FWhatsApp%20Video%202024-09-13%20at%205.25.47%20PM.mp4?alt=media&token=712f3f73-9b61-4c5a-97e9-7081dc161e33',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
-  },
-  {
-    id: '2',
-    title: 'The Threat of Free WiFi',
-    description: 'Understand the risks of public WiFi.',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
-  },
-  {
-    id: '3',
-    title: 'Cybersecurity Essentials',
-    description: 'Basic cybersecurity tips everyone should know.',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-3.png?alt=media&token=42b8ef40-cdaa-45e2-b8e1-df0454163369',
-  },
-  {
-    id: '4',
-    title: 'Data Privacy Basics',
-    description: 'Protecting your personal data.',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-4.webp?alt=media&token=b73d88fa-55e4-47dd-9190-04d6962d76ff',
-  },
-  {
-    id: '5',
-    title: 'Encora Unity Basic Course',
-    description: 'Essentials of Unity game development',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
-  },
-  {
-    id: '6',
-    title: 'Encora Unity Basic Course',
-    description: 'Essentials of Unity game development',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
-  },
-];
+import videoData from '../utilities/constant/VideoData';
 
 export default function Library({navigation}) {
   const openVideo = videoUri => {

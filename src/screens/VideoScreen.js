@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   StatusBar,
+  ImageBackground,
 } from 'react-native';
 import Video from 'react-native-video';
 import QuizModal from '../modal/QuizModal';
@@ -17,6 +18,10 @@ import PlayerControls from './video-player/playerControls';
 import ProgressBar from './video-player/progressBar';
 import FullscreenOpen from '../utilities/svg/FullscreenOpen';
 import FullscreenClose from '../utilities/svg/FullscreenClose';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import VideoBack from '../utilities/svg/VideoBack';
+import videoData from '../utilities/constant/VideoData';
+import quizQuestion from '../utilities/constant/QuizData';
 
 const windowHeight = Dimensions.get('window').width * (9 / 16);
 const windowWidth = Dimensions.get('window').width;
@@ -24,70 +29,7 @@ const windowWidth = Dimensions.get('window').width;
 const height = Dimensions.get('window').width;
 const width = Dimensions.get('window').height;
 
-const videoData = [
-  {
-    id: '1',
-    title: 'Voice on Security: USB Drop',
-    description:
-      'This video discusses the risks of using unknown USB devices and how they can pose a security threat.',
-    uri: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    thumbnail:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
-  },
-  {
-    id: '2',
-    title: 'The Threat of Free WiFi',
-    description:
-      'Learn about the dangers of using unsecured public WiFi networks and how to protect your data.',
-    uri: 'https://www.w3schools.com/html/movie.mp4',
-    thumbnail:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
-  },
-  {
-    id: '3',
-    title: 'Cybersecurity Essentials',
-    description:
-      'An introduction to the basics of cybersecurity and why it’s important for everyone.',
-    uri: 'https://www.w3schools.com/html/mov_bbb.mp4',
-    thumbnail:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-3.png?alt=media&token=42b8ef40-cdaa-45e2-b8e1-df0454163369',
-  },
-];
-
-const quizQuestion = [
-  {
-    question: 'What is the capital of France?',
-    options: ['Paris', 'London', 'Berlin', 'Madrid'],
-    answer: 'Paris,',
-  },
-  {
-    question: 'Which planet is known as the Red Planet?',
-    options: ['Earth', 'Mars', 'Jupiter', 'Saturn'],
-    answer: 'Mars',
-  },
-  {
-    question: 'What is the largest ocean on Earth?',
-    options: [
-      'Atlantic Ocean',
-      'Indian Ocean',
-      'Arctic Ocean',
-      'Pacific Ocean',
-    ],
-    answer: 'Pacific Ocean',
-  },
-  {
-    question: "Who wrote 'Hamlet'?",
-    options: [
-      'Charles Dickens',
-      'Mark Twain',
-      'William Shakespeare',
-      'Leo Tolstoy',
-    ],
-    answer: 'William Shakespeare',
-  },
-];
-
-export default function VideoScreen() {
+export default function VideoScreen({navigation}) {
   const videoRef = useRef(null);
   const [currentVideo, setCurrentVideo] = useState(videoData[0]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -95,7 +37,7 @@ export default function VideoScreen() {
   const [isQuizModal, setIsQuizModal] = useState(false);
   const [isQuizSubmit, setIsQuizSubmit] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState(
-    Array(quizQuestion.length).fill(null)
+    Array(quizQuestion.length).fill(null),
   );
   const [isVideoEnded, setIsVideoEnded] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -104,7 +46,7 @@ export default function VideoScreen() {
   const [showControl, setShowControl] = useState(true);
 
   useEffect(() => {
-    const handleOrientation = (orientation) => {
+    const handleOrientation = orientation => {
       setFullscreen(orientation.includes('LANDSCAPE'));
       StatusBar.setHidden(orientation.includes('LANDSCAPE'));
     };
@@ -115,16 +57,21 @@ export default function VideoScreen() {
     };
   }, []);
 
-  const playVideo = (video) => {
+  const playVideo = (video, isEnd) => {
     setCurrentVideo(video);
     setIsPlaying(true);
     setIsQuizButton(false);
     setIsQuizSubmit(false);
     setSelectedAnswer(Array(quizQuestion.length).fill(null));
     setIsVideoEnded(false);
+    if (isEnd) {
+      setCurrentTime(0);
+      videoRef.current.seek(0);
+    }
   };
 
   const handleVideoEnd = () => {
+    setIsPlaying(false);
     if (!isQuizSubmit) {
       setIsQuizButton(true);
       setIsVideoEnded(true);
@@ -132,31 +79,36 @@ export default function VideoScreen() {
   };
 
   const handlePlayPause = () => {
-    setIsPlaying((prev) => !prev);
-    setShowControl(true);
+    if (isVideoEnded) {
+      playVideo(currentVideo, true);
+    } else {
+      setIsPlaying(prev => !prev);
+      setShowControl(true);
+    }
   };
-  
-  const onLoadEnd = (data) => {
+
+  const onLoadEnd = data => {
     setDuration(data.duration);
   };
 
-  const onProgress = (data) => {
+  const onProgress = data => {
     setCurrentTime(data.currentTime);
   };
 
-  const onSeek = (seekTime) => {
+  const onSeek = seekTime => {
     videoRef.current.seek(seekTime);
   };
 
   const handleControls = () => {
-    setShowControl((prev) => !prev);
+    setShowControl(prev => !prev);
   };
 
   const handleFullscreen = () => {
     if (fullscreen) {
-      Orientation.unlockAllOrientations();
+      Orientation.lockToPortrait();
     } else {
       Orientation.lockToLandscapeLeft();
+      setFullscreen(true);
     }
   };
 
@@ -166,20 +118,45 @@ export default function VideoScreen() {
       (answer, index) => answer === correctAnswer[index],
     );
     alert(
-      isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect',
+      isCorrect ? 'Quiz completed successfully!' : 'Some answers are incorrect',
     );
     setIsQuizSubmit(true);
     setIsQuizModal(false);
     setIsQuizButton(false);
   };
 
+  const goBack = () => {
+    if (fullscreen) {
+      handleFullscreen();
+    } else {
+      navigation.goBack();
+    }
+  };
+
+  const handleVideoError = () => {
+    alert('Failed to load the video. Please try again later.');
+    setIsPlaying(false);
+  };
+
   return (
     <ScrollView style={styles.container}>
-      <View style={fullscreen ? styles.fullscreenContainer : styles.videoContainer}>
+      <ImageBackground
+        style={styles.imgback}
+        source={require('../assets/logo/bg1.jpg')}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={goBack} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#333" />
+          </TouchableOpacity>
+          <Text style={styles.title}>{currentVideo.title}</Text>
+        </View>
+      </ImageBackground>
+
+      <View
+        style={fullscreen ? styles.fullscreenContainer : styles.videoContainer}>
         <TouchableOpacity onPress={handleControls}>
           <Video
             ref={videoRef}
-            source={{ uri: currentVideo.uri}}
+            source={{uri: currentVideo.uri}}
             style={fullscreen ? styles.fullscreenVideo : styles.video}
             controls={false}
             resizeMode={'contain'}
@@ -187,6 +164,7 @@ export default function VideoScreen() {
             onLoad={onLoadEnd}
             onProgress={onProgress}
             onEnd={handleVideoEnd}
+            onError={handleVideoError}
           />
 
           {showControl && (
@@ -195,6 +173,10 @@ export default function VideoScreen() {
                 onPress={handleFullscreen}
                 style={styles.fullscreenButton}>
                 {fullscreen ? <FullscreenClose /> : <FullscreenOpen />}
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={goBack} style={styles.videoBackButton}>
+                <VideoBack />
               </TouchableOpacity>
 
               <PlayerControls
@@ -215,13 +197,14 @@ export default function VideoScreen() {
         </TouchableOpacity>
 
         {isQuizButton && !isQuizSubmit && (
-          <TouchableOpacity style={styles.quizButton} onPress={() => setIsQuizModal(true)}>
+          <TouchableOpacity
+            style={styles.quizButton}
+            onPress={() => setIsQuizModal(true)}>
             <Text style={styles.quizbtnText}>Take the Quiz</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Video Details */}
       <View style={styles.videoDetails}>
         {isVideoEnded && !isQuizSubmit && (
           <View style={styles.quizIncomplete}>
@@ -232,23 +215,35 @@ export default function VideoScreen() {
         <Text style={styles.videoDescription}>{currentVideo.description}</Text>
       </View>
 
-      {/* Recommended Videos */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Recommended Videos</Text>
-        <FlatList
-          data={videoData}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.recommendItem} onPress={() => playVideo(item)}>
-              <Image source={{ uri: item.thumbnail }} style={styles.recommendImage} />
-              <Text style={styles.recommendText}>{item.title}</Text>
-            </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-        />
+        {videoData.map(item => (
+          <TouchableOpacity key={item.id} onPress={() => playVideo(item)}>
+            <View style={styles.recommendItem}>
+              <View style={styles.imageContainer}>
+                <Image
+                  style={styles.recommendImage}
+                  source={{uri: item.thumbnailUrl}}
+                />
+                <TouchableOpacity
+                  style={styles.playCircleContainer}
+                  onPress={() => playVideo(item)}>
+                  <View style={styles.playCircle}>
+                    <Ionicons name="play" size={25} color="white" />
+                  </View>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.recommendDetails}>
+                <Text style={styles.recommendText}>{item.title}</Text>
+                <Text style={styles.recommendDescription}>
+                  {item.description}
+                </Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))}
       </View>
 
-      {/* Quiz Modal */}
       <QuizModal
         isVisible={isQuizModal}
         questions={quizQuestion}
@@ -266,6 +261,38 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
+  // Header Styles
+  imgback: {
+    padding: 15,
+    height: 70,
+    backgroundColor: '#f8f8f8',
+    flexDirection: 'row',
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  backButton: {
+    paddingHorizontal: 15,
+  },
+  title: {
+    fontSize: 20,
+    color: '#333',
+    fontWeight: 'bold',
+    flex: 1,
+    textAlign: 'center',
+  },
+  // video
   videoContainer: {
     width: Dimensions.get('window').width,
     height: 250,
@@ -330,6 +357,13 @@ const styles = StyleSheet.create({
     color: '#555',
     marginTop: 5,
   },
+  videoBackButton: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    zIndex: 10, // Ensure the button is above other elements
+    padding: 10,
+  },
   //recommended
   section: {
     padding: 15,
@@ -339,24 +373,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 10,
-  },
-  recommendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-  },
-  recommendImage: {
-    width: 100,
-    height: 60,
-    borderRadius: 8,
-    marginRight: 10,
-    alignSelf: 'center',
-  },
-  recommendText: {
-    fontSize: 16,
-    color: '#000',
-    fontWeight: 'bold',
-    flex: 1,
   },
   //quiz
   quizbtnText: {
@@ -378,15 +394,14 @@ const styles = StyleSheet.create({
   },
   quizButton: {
     position: 'absolute',
-    bottom: '15%',
-    left: '78%',
-    backgroundColor: 'rgba(128, 128, 128, 0.7)',
+    bottom: '23%',
+    left: '80%',
     paddingVertical: 10,
     borderColor: 'rgba(255, 255, 255, 0.8)',
     paddingHorizontal: 15,
     borderWidth: 1,
     borderRadius: 25,
-    transform: [{ translateX: -50 }],
+    transform: [{translateX: -50}],
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -395,5 +410,82 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 3.84,
     elevation: 5,
+  },
+
+  //Recommended
+  listContainer: {
+    padding: 10,
+  },
+  recommendItem: {
+    flexDirection: 'row',
+    padding: 10,
+    marginBottom: 10,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    borderBottomWidth: 1, // Add this line for the bottom border
+    borderBottomColor: '#ccc',
+    marginHorizontal: 10,
+  },
+  recommendImage: {
+    width: 110,
+    height: 120,
+    borderRadius: 8,
+  },
+  recommendDetails: {
+    flex: 1,
+    marginLeft: 10,
+    justifyContent: 'center',
+  },
+  recommendText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  recommendDescription: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 5,
+  },
+  playButton: {
+    backgroundColor: '#ffc100',
+    borderRadius: 25,
+    padding: 10,
+    marginTop: 10,
+    alignSelf: 'flex-start',
+  },
+  playButtonText: {
+    fontSize: 14,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  imageContainer: {
+    position: 'relative',
+  },
+  recommendImage: {
+    width: 110,
+    height: 120,
+    borderRadius: 8,
+  },
+  playCircleContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  playCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
