@@ -75,12 +75,12 @@ export default function QuizScreen({ navigation }) {
         <View style={styles.header}>
         
           <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
-            <Ionicons name="chevron-back-circle-sharp" size={34} color="#888" />
+            <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
           </TouchableOpacity>
 
           <Text style={styles.title}>Quiz </Text>
           <TouchableOpacity style={styles.notificationIcon}>
-            <Icon name="notifications-circle-sharp" size={34} color="#888"/>
+            <Icon name="share-social-outline" size={30} color="#fff"/>
           </TouchableOpacity>
         </View>
       </ImageBackground>
@@ -166,7 +166,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 10,
     marginBottom: 10,
-    // backgroundColor: '#fff',
+    backgroundColor: '#888',
     borderRadius: 20,
     // shadowColor: '#000',
     // shadowOffset: { width: 0, height: 2 },
@@ -195,11 +195,11 @@ const styles = StyleSheet.create({
   quizText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#fff',
   },
   quizDescription: {
     fontSize: 15,
-    color: '#666',
+    color: '#fff',
     marginTop: 5,
   },
   iconStyle: {

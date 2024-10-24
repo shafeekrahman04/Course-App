@@ -140,10 +140,10 @@ const styles = StyleSheet.create({
   imgback: {
     padding: 16,
     resizeMode: 'cover',
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-    overflow: 'hidden',
-    height: 120,
+    // borderBottomLeftRadius: 30,
+    // borderBottomRightRadius: 30,
+    // overflow: 'hidden',
+    height: 80,
   },
   modalView: {
     backgroundColor: 'white',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     // width: '100%',
     // marginBottom: 10,
-    marginTop: 25,
+    marginTop: 10,
   },
   modaltxt: {
     fontSize: 20,

@@ -9,6 +9,7 @@ import {
   Dimensions,
   ScrollView,
   StatusBar,
+  ImageBackground,
 } from 'react-native';
 import Video from 'react-native-video';
 import QuizModal from '../modal/QuizModal';
@@ -17,12 +18,16 @@ import PlayerControls from './video-player/playerControls';
 import ProgressBar from './video-player/progressBar';
 import FullscreenOpen from '../utilities/svg/FullscreenOpen';
 import FullscreenClose from '../utilities/svg/FullscreenClose';
+import Icon from 'react-native-vector-icons/Ionicons';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
 
 const windowHeight = Dimensions.get('window').width * (9 / 16);
 const windowWidth = Dimensions.get('window').width;
 
 const height = Dimensions.get('window').width;
 const width = Dimensions.get('window').height;
+
 
 const videoData = [
   {
@@ -87,7 +92,7 @@ const quizQuestion = [
   },
 ];
 
-export default function VideoScreen() {
+export default function VideoScreen({ navigation }) {
   const videoRef = useRef(null);
   const [currentVideo, setCurrentVideo] = useState(videoData[0]);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -112,6 +117,7 @@ export default function VideoScreen() {
     Orientation.addOrientationListener(handleOrientation);
     return () => {
       Orientation.removeOrientationListener(handleOrientation);
+      Orientation.unlockAllOrientations();
     };
   }, []);
 
@@ -135,7 +141,7 @@ export default function VideoScreen() {
     setIsPlaying((prev) => !prev);
     setShowControl(true);
   };
-  
+
   const onLoadEnd = (data) => {
     setDuration(data.duration);
   };
@@ -155,6 +161,7 @@ export default function VideoScreen() {
   const handleFullscreen = () => {
     if (fullscreen) {
       Orientation.unlockAllOrientations();
+      // Orientation.lockToPortrait();
     } else {
       Orientation.lockToLandscapeLeft();
     }
@@ -174,97 +181,143 @@ export default function VideoScreen() {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={fullscreen ? styles.fullscreenContainer : styles.videoContainer}>
-        <TouchableOpacity onPress={handleControls}>
-          <Video
-            ref={videoRef}
-            source={{ uri: currentVideo.uri}}
-            style={fullscreen ? styles.fullscreenVideo : styles.video}
-            controls={false}
-            resizeMode={'contain'}
-            paused={!isPlaying}
-            onLoad={onLoadEnd}
-            onProgress={onProgress}
-            onEnd={handleVideoEnd}
-          />
+    <>
+      {!fullscreen && (
+        <ImageBackground
+          style={styles.imgback}
+          source={require('../assets/logo/bg1.jpg')}
+        >
 
-          {showControl && (
-            <View style={styles.controlOverlay}>
-              <TouchableOpacity
-                onPress={handleFullscreen}
-                style={styles.fullscreenButton}>
-                {fullscreen ? <FullscreenClose /> : <FullscreenOpen />}
-              </TouchableOpacity>
+          <View style={styles.header}>
 
-              <PlayerControls
-                onPlay={handlePlayPause}
-                onPause={handlePlayPause}
-                playing={isPlaying}
-                skipBackwards={() => onSeek(currentTime - 15)}
-                skipForwards={() => onSeek(currentTime + 15)}
-              />
-
-              <ProgressBar
-                currentTime={currentTime}
-                duration={duration > 0 ? duration : 0}
-                onSlideCapture={onSeek}
-              />
-            </View>
-          )}
-        </TouchableOpacity>
-
-        {isQuizButton && !isQuizSubmit && (
-          <TouchableOpacity style={styles.quizButton} onPress={() => setIsQuizModal(true)}>
-            <Text style={styles.quizbtnText}>Take the Quiz</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {/* Video Details */}
-      <View style={styles.videoDetails}>
-        {isVideoEnded && !isQuizSubmit && (
-          <View style={styles.quizIncomplete}>
-            <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
-          </View>
-        )}
-        <Text style={styles.videoTitle}>{currentVideo.title}</Text>
-        <Text style={styles.videoDescription}>{currentVideo.description}</Text>
-      </View>
-
-      {/* Recommended Videos */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Recommended Videos</Text>
-        <FlatList
-          data={videoData}
-          renderItem={({ item }) => (
-            <TouchableOpacity style={styles.recommendItem} onPress={() => playVideo(item)}>
-              <Image source={{ uri: item.thumbnail }} style={styles.recommendImage} />
-              <Text style={styles.recommendText}>{item.title}</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
+              <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
             </TouchableOpacity>
-          )}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-        />
-      </View>
 
-      {/* Quiz Modal */}
-      <QuizModal
-        isVisible={isQuizModal}
-        questions={quizQuestion}
-        onClose={() => setIsQuizModal(false)}
-        onSubmit={submitQuiz}
-        selectedAnswers={selectedAnswer}
-        setSelectedAnswer={setSelectedAnswer}
+            <Text style={styles.title}>{currentVideo.title} </Text>
+            {/* <TouchableOpacity style={styles.notificationIcon}>
+            <Icon name="share-social-outline" size={30} color="#fff"/>
+          </TouchableOpacity> */}
+          </View>
+
+        </ImageBackground>
+      )}
+      <FlatList
+        style={styles.container}
+        data={[]}
+        keyExtractor={(item, index) => index.toString()}
+        ListHeaderComponent={
+          <>
+            {/* Video Player and Controls */}
+            <View style={fullscreen ? styles.fullscreenContainer : styles.videoContainer}>
+              <TouchableOpacity onPress={handleControls}>
+                <Video
+                  ref={videoRef}
+                  source={{ uri: currentVideo.uri }}
+                  style={fullscreen ? styles.fullscreenVideo : styles.video}
+                  controls={false}
+                  resizeMode={'contain'}
+                  paused={!isPlaying}
+                  onLoad={onLoadEnd}
+                  onProgress={onProgress}
+                  onEnd={handleVideoEnd}
+                />
+                {showControl && (
+                  <View style={styles.controlOverlay}>
+                    <TouchableOpacity
+                      onPress={handleFullscreen}
+                      style={styles.fullscreenButton}>
+                      {fullscreen ? <FullscreenClose /> : <FullscreenOpen />}
+                    </TouchableOpacity>
+                    <PlayerControls
+                      onPlay={handlePlayPause}
+                      onPause={handlePlayPause}
+                      playing={isPlaying}
+                      skipBackwards={() => onSeek(currentTime - 15)}
+                      skipForwards={() => onSeek(currentTime + 15)}
+                    />
+                    <ProgressBar
+                      currentTime={currentTime}
+                      duration={duration > 0 ? duration : 0}
+                      onSlideCapture={onSeek}
+                    />
+                  </View>
+                )}
+              </TouchableOpacity>
+              {isQuizButton && !isQuizSubmit && (
+                <TouchableOpacity style={styles.quizButton} onPress={() => setIsQuizModal(true)}>
+                  <Text style={styles.quizbtnText}>Take the Quiz</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+
+            {/* Video Details */}
+            <View style={styles.videoDetails}>
+              {isVideoEnded && !isQuizSubmit && (
+                <View style={styles.quizIncomplete}>
+                  <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
+                </View>
+              )}
+
+              <Text style={styles.videoDescription}>{currentVideo.description}</Text>
+            </View>
+          </>
+        }
+        ListFooterComponent={
+          <>
+            {/* Recommended Videos */}
+            {!fullscreen && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Recommended Videos</Text>
+                <FlatList
+                  data={videoData}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity style={styles.recommendItem} onPress={() => playVideo(item)}>
+                      <Image source={{ uri: item.thumbnail }} style={styles.recommendImage} />
+                      <Text style={styles.recommendText}>{item.title}</Text>
+                    </TouchableOpacity>
+                  )}
+                  keyExtractor={(item) => item.id}
+                  showsVerticalScrollIndicator={false}
+                />
+              </View>
+            )}
+          </>
+        }
       />
-    </ScrollView>
+    </>
   );
+
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  imgback: {
+    padding: 16,
+    resizeMode: 'cover',
+    // borderBottomLeftRadius: 30,
+    // borderBottomRightRadius: 30,
+    overflow: 'hidden',
+    height: 80,
+    // marginBottom: 10,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // padding: 10,
+    marginTop: 7,
+    gap: 10
+  },
+
+  title: {
+    fontSize: 18,
+    color: '#888',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    flex: 1,
   },
   videoContainer: {
     width: Dimensions.get('window').width,
