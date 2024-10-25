@@ -7,15 +7,43 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  Modal,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../security/AuthContext';
 import videoData from '../utilities/constant/VideoData';
+import {getDashboardData} from '../api/HomeApiService';
+import {alertMessageType} from '../utilities/enum/Enum';
+import AlertMessage from '../shared/AlertMessage';
+import Loader from '../shared/Loader';
 
 export default function Home({navigation}) {
+
+  const defualtVideoData ={
+    id:'',
+    title:'',
+    thumbnailUrl:"",
+    videoUrl:'',
+    description:'',
+    watchedStatus:'',
+  }
   const authContext = useAuth();
+  const [watchedVideoData, setWatchedVideoData] = useState(defualtVideoData);
+  const [unWatchedVideoData, setUnWatchedVideoData] = useState(defualtVideoData);
+  const [loader, setLoader] = useState(false);
+  const [alertMessage, setAlertMessage] = useState({
+    message: '',
+    timestamp: Date.now(),
+  });
+  const [alertType, setAlertType] = useState('');
+
+  const alertMessagePopUp = (message, messageType) => {
+    setAlertMessage({message: message, timestamp: new Date()});
+    setAlertType(messageType);
+  };
+
   const openVideo = videoUri => {
     navigation.navigate('VideoScreen', {videoUri});
   };
@@ -24,6 +52,49 @@ export default function Home({navigation}) {
     authContext.logout();
     navigation.navigate('Login');
   }
+
+  const getVideoData = async () => {
+    try {
+      setLoader(true);
+      const res = await getDashboardData();
+      if (res) {
+        if (res.data) {
+          const watchedVideos = res.data.filter(video => video.WatchedStatus === 1);
+          const unwatchedVideos = res.data.filter(video => video.WatchedStatus === 0);
+          const defaultThumbnail = 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47';
+
+          setWatchedVideoData(watchedVideos.map(video => ({
+            id: video.VideoId,
+            title: video.VideoTitle,
+            thumbnailUrl: video.ThumbNail || defaultThumbnail,
+            videoUrl: video.UploadedLocation,
+            description: video.VideoDescription,
+            watchedStatus: video.WatchedStatus,
+          })));
+    
+          setUnWatchedVideoData(unwatchedVideos.map(video => ({
+            id: video.VideoId,
+            title: video.VideoTitle,
+            thumbnailUrl: video.ThumbNail || defaultThumbnail, 
+            videoUrl: video.UploadedLocation,
+            description: video.VideoDescription,
+            watchedStatus: video.WatchedStatus,
+          })));
+        } else
+          alertMessagePopUp('Some thing went wrong',alertMessageType.DANGER.code);
+      } else {
+        alertMessagePopUp('Some thing went wrong Please Try Again Later',alertMessageType.DANGER.code);
+      }
+      setLoader(false);
+    } catch (error) {
+      alertMessagePopUp(error.message, alertMessageType.DANGER.code);
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getVideoData();
+  }, []);
 
   return (
     <ScrollView
@@ -103,20 +174,28 @@ export default function Home({navigation}) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Latest Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.recommendations}>
-            {videoData.map(item => (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => openVideo(item.videoUrl)}>
-                <View style={styles.recommendItem}>
-                  <Image
-                    style={styles.recommendImage}
-                    source={{uri: item.thumbnailUrl}}
-                  />
-                  <Text style={styles.recommendText}>{item.title}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.videoSection}>
+          {unWatchedVideoData.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.videoSection}>
+              {unWatchedVideoData.map(item => (
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => openVideo(item.videoUrl)}>
+                  <View style={styles.videoItem}>
+                    <Image
+                      style={styles.thumbNailImg}
+                      source={{uri: item.thumbnailUrl}}
+                    />
+                    <Text style={styles.videoTitle}>{item.title}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        ) : (
+          <Text style={styles.noDataText}>No videos available in this section.</Text>
+        )}
           </View>
         </ScrollView>
       </View>
@@ -126,23 +205,39 @@ export default function Home({navigation}) {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Watched Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.recommendations}>
-            {videoData.map(item => (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => openVideo(item.videoUrl)}>
-                <View style={styles.recommendItem}>
-                  <Image
-                    style={styles.recommendImage}
-                    source={{uri: item.thumbnailUrl}}
-                  />
-                  <Text style={styles.recommendText}>{item.title}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
+          <View style={styles.videoSection}>
+          {watchedVideoData.length > 0 ? (
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <View style={styles.videoSection}>
+              {watchedVideoData.map(item => (
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => openVideo(item.videoUrl)}>
+                  <View style={styles.videoItem}>
+                    <Image
+                      style={styles.thumbNailImg}
+                      source={{uri: item.thumbnailUrl}}
+                    />
+                    <Text style={styles.videoTitle}>{item.title}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        ) : (
+          <Text style={styles.noDataText}>No videos watched yet.</Text>
+        )}
           </View>
         </ScrollView>
       </View>
+
+      {/* Alert */}
+      <AlertMessage message={alertMessage} messageType={alertType} />
+
+      {/* loader */}
+      <Modal visible={loader} transparent>
+        <Loader />
+      </Modal>
     </ScrollView>
   );
 }
@@ -262,34 +357,28 @@ const styles = StyleSheet.create({
   },
 
   //latest
-  recommendations: {
+  videoSection: {
     flexDirection: 'row',
   },
-  recommendItem: {
+  videoItem: {
     width: 200,
     marginRight: 10,
   },
-  recommendImage: {
+  thumbNailImg: {
     width: '100%',
     height: 120,
     borderRadius: 8,
   },
-  recommendText: {
+  videoTitle: {
     marginTop: 5,
     fontSize: 14,
     color: '#000',
     fontWeight: 'bold',
   },
-  orgRecommendations: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  orgRecommendItem: {
-    width: '48%',
-  },
-  orgRecommendText: {
-    color: '#000',
-    fontWeight: 'bold',
+  noDataText: {
     textAlign: 'center',
+    color: '#888',
+    fontSize: 16,
+    marginTop: 20,
   },
 });

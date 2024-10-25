@@ -1,0 +1,5 @@
+import apiClient from './ApiClient';
+
+export const getDashboardData = (id = '') => apiClient.get(`/studentDashboard?id=${id}`);
+
+export const getQuizDetails = (id = '') => apiClient.get(`/getQuizDetails?id=${id}`);

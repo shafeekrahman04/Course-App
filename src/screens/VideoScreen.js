@@ -106,6 +106,7 @@ export default function VideoScreen({navigation}) {
   const handleFullscreen = () => {
     if (fullscreen) {
       Orientation.lockToPortrait();
+      setFullscreen(false);
     } else {
       Orientation.lockToLandscapeLeft();
       setFullscreen(true);
@@ -117,9 +118,7 @@ export default function VideoScreen({navigation}) {
     const isCorrect = selectedAnswer.every(
       (answer, index) => answer === correctAnswer[index],
     );
-    alert(
-      isCorrect ? 'Quiz completed successfully!' : 'Some answers are incorrect',
-    );
+    alert(isCorrect ? 'Quiz completed successfully!' : 'Some answers are incorrect');
     setIsQuizSubmit(true);
     setIsQuizModal(false);
     setIsQuizButton(false);
@@ -294,16 +293,12 @@ const styles = StyleSheet.create({
   imgback: {
     padding: 16,
     resizeMode: 'cover',
-    // borderBottomLeftRadius: 30,
-    // borderBottomRightRadius: 30,
     overflow: 'hidden',
     height: 70,
-    // marginBottom: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    // padding: 10,
     marginTop: 7,
     gap: 10,
   },
