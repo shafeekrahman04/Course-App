@@ -7,12 +7,16 @@ import {
   TouchableOpacity,
   ImageBackground,
   FlatList,
+  RefreshControl,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import videoData from '../utilities/constant/VideoData';
 
 export default function Library({navigation}) {
+const [refreshing, setRefreshing] = useState(false);
+
   const openVideo = videoUri => {
     navigation.navigate('VideoScreen', {videoUri});
   };
@@ -41,6 +45,13 @@ export default function Library({navigation}) {
     </TouchableOpacity>
   );
 
+  const onRefresh = () =>{
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  }
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -48,6 +59,9 @@ export default function Library({navigation}) {
         style={styles.imgback}
         source={require('../assets/logo/bg1.jpg')}>
         <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
+            <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
+          </TouchableOpacity>
           <Text style={styles.title}>Library</Text>
         </View>
       </ImageBackground>
@@ -65,6 +79,9 @@ export default function Library({navigation}) {
         data={videoData}
         keyExtractor={item => item.id}
         renderItem={renderVideoItem}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+        }
       />
     </View>
   );
@@ -85,13 +102,21 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 15,
-    marginTop: 20,
+    marginTop: 12,
+    flexDirection:'row',
+    alignItems:'center',
+   
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
   },
   title: {
     fontSize: 24,
     color: '#888',
     fontWeight: 'bold',
     textAlign: 'center',
+    flex:1
   },
   searchContainer: {
     flexDirection: 'row',

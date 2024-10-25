@@ -7,14 +7,17 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  RefreshControl,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../security/AuthContext';
 import videoData from '../utilities/constant/VideoData';
 
 export default function Home({navigation}) {
+const [refreshing, setRefreshing] = useState(false);
+
   const authContext = useAuth();
   const openVideo = videoUri => {
     navigation.navigate('VideoScreen', {videoUri});
@@ -25,10 +28,21 @@ export default function Home({navigation}) {
     navigation.navigate('Login');
   }
 
+const onRefresh =()=>{
+  setRefreshing(true);
+  setTimeout(() => {
+    setRefreshing(false);
+  }, 2000);
+}
+
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{paddingBottom: 20}}>
+      contentContainerStyle={{paddingBottom: 20}}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+      }
+      >
       {/* Header */}
       <ImageBackground
         style={styles.imgback}

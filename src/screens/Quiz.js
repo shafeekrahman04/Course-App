@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
   FlatList,
+  RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -42,6 +43,7 @@ const quizData = [
 ];
 
 export default function QuizScreen({ navigation }) {
+const [refreshing, setRefreshing] = useState(false);
 
   const openQuizForm = (quiz) => {
     navigation.navigate('QuizDetails', { quiz });
@@ -57,10 +59,17 @@ export default function QuizScreen({ navigation }) {
           <Text style={styles.quizText}>{item.title}</Text>
           <Text style={styles.quizDescription}>{item.description}</Text>
         </View>
-        <Ionicons name="chevron-forward-outline" size={25} color="#ffc100" style={styles.iconStyle} />
+        <Ionicons name="chevron-forward-outline" size={25} color="black" style={styles.iconStyle} />
       </View>
     </TouchableOpacity>
   );
+
+  const onRefresh = () =>{
+    setRefreshing(true);
+    setTimeout(()=>{
+      setRefreshing(false);
+    }, 2000);
+  }
 
   return (
     <View style={styles.container}>
@@ -70,16 +79,13 @@ export default function QuizScreen({ navigation }) {
         source={require('../assets/logo/bg1.jpg')}
       >
         <View style={styles.header}>
-        
           <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
             <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
           </TouchableOpacity>
-
-          <Text style={styles.title}>Quiz </Text>
-          <TouchableOpacity style={styles.notificationIcon}>
-            <Icon name="share-social-outline" size={30} color="#fff"/>
-          </TouchableOpacity>
+          <Text style={styles.title}>Ready to Quiz? Let’s Go</Text>
+          
         </View>
+        <Text style={styles.titling}>Improve your skills with these quizzes.</Text>
       </ImageBackground>
 
       {/* List of quizzes */}
@@ -87,6 +93,9 @@ export default function QuizScreen({ navigation }) {
         data={quizData}
         keyExtractor={(item) => item.id}
         renderItem={renderQuizItem}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+        }
       />
 
     </View>
@@ -96,7 +105,7 @@ export default function QuizScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#f9f9f9',
   },
   imgback: {
     padding: 16,
@@ -106,17 +115,21 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     height: 120,
     marginBottom: 10,
+    alignItems:'center',
+    justifyContent:'center'
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 15,
-    marginTop: 15,
-    justifyContent:'space-between'
+    // padding: 15,
+    // marginTop: 8,
+    justifyContent:'center'
   },
   backButton: {
     position: 'absolute',
     left: 0,
+    top:12,
+    zIndex:10
   },
   title: {
     fontSize: 24,
@@ -124,6 +137,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     flex: 1,
+  },
+  titling: {
+    fontSize: 13,
+    color: '#000',
+    paddingTop:8
+    
   },
   searchContainer: {
     flexDirection: 'row',
@@ -152,15 +171,20 @@ const styles = StyleSheet.create({
   },
   quizItem: {
     flexDirection: 'row',
-    padding: 10,
+    padding: 16,
     marginBottom: 10,
-    backgroundColor: '#888',
-    borderRadius: 20,
+    backgroundColor: '#fff',
+    borderRadius: 12,
     marginHorizontal: 10,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
-
+    borderColor: '#fde07c',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  
   },
   quizImage: {
     width: 80,
@@ -176,12 +200,13 @@ const styles = StyleSheet.create({
   quizText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#fff',
+    color: '#eebd01',
   },
   quizDescription: {
     fontSize: 15,
-    color: '#fff',
-    marginTop: 5,
+    color: '#757575',
+    marginTop: 6,
+    lineHeight:21
   },
   iconStyle: {
     marginLeft: 10,
