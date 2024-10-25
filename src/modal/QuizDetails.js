@@ -7,11 +7,13 @@ import {
   FlatList,
   StyleSheet,
   ImageBackground,
+  RefreshControl,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import quizQuestion from '../utilities/constant/QuizData';
 
 const QuizDetails = ({navigation}) => {
+const [refreshing, setRefreshing] = useState(false);
 
   const [selectedAnswers, setSelectedAnswers] = useState(
     Array(quizQuestion.length).fill(null)
@@ -61,6 +63,13 @@ const QuizDetails = ({navigation}) => {
     </View>
   );
 
+  const onRefresh =() =>{
+    setRefreshing(true);
+    setTimeout(()=>{
+      setRefreshing(false);
+    }, 2000);
+  }
+
   return (
     <View style={styles.container}>
       <ImageBackground
@@ -68,13 +77,13 @@ const QuizDetails = ({navigation}) => {
         source={require('../assets/logo/bg1.jpg')}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')}>
+          <TouchableOpacity onPress={() => navigation.navigate('Quiz')}>
             <Icon name="chevron-back-circle-sharp" size={30} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.modaltxt}>Quiz Question</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('Quiz')}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate('Quiz')}>
             <Icon name="close" size={30} color="#fff" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
 
         </View>
 
@@ -85,6 +94,9 @@ const QuizDetails = ({navigation}) => {
         renderItem={renderQuestionItem}
         keyExtractor={(item, index) => index.toString()}
         style={styles.flatList}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
+        }
       />
       <TouchableOpacity style={styles.submitQuizbtn} onPress={handleQuizSubmit}>
         <Text style={styles.submitQuizTxt}>Submit Quiz</Text>
@@ -121,6 +133,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#888',
+    flex:1,
+    textAlign:'center'
   },
   quesContainer: {
     marginBottom: 20,

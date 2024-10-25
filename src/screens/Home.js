@@ -8,27 +8,28 @@ import {
   TouchableOpacity,
   ImageBackground,
   Modal,
+  RefreshControl,
 } from 'react-native';
 import React, {useEffect, useState} from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {useAuth} from '../security/AuthContext';
-import videoData from '../utilities/constant/VideoData';
 import {getDashboardData} from '../api/HomeApiService';
 import {alertMessageType} from '../utilities/enum/Enum';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
 
 export default function Home({navigation}) {
+  const defualtVideoData = {
+    id: '',
+    title: '',
+    thumbnailUrl: '',
+    videoUrl: '',
+    description: '',
+    watchedStatus: '',
+  };
+  const [refreshing, setRefreshing] = useState(false);
 
-  const defualtVideoData ={
-    id:'',
-    title:'',
-    thumbnailUrl:"",
-    videoUrl:'',
-    description:'',
-    watchedStatus:'',
-  }
   const authContext = useAuth();
   const [watchedVideoData, setWatchedVideoData] = useState(defualtVideoData);
   const [unWatchedVideoData, setUnWatchedVideoData] = useState(defualtVideoData);
@@ -59,27 +60,35 @@ export default function Home({navigation}) {
       const res = await getDashboardData();
       if (res) {
         if (res.data) {
-          const watchedVideos = res.data.filter(video => video.WatchedStatus === 1);
-          const unwatchedVideos = res.data.filter(video => video.WatchedStatus === 0);
+          const watchedVideos = res.data.filter(
+            video => video.WatchedStatus === 1,
+          );
+          const unwatchedVideos = res.data.filter(
+            video => video.WatchedStatus === 0,
+          );
           const defaultThumbnail = 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47';
 
-          setWatchedVideoData(watchedVideos.map(video => ({
-            id: video.VideoId,
-            title: video.VideoTitle,
-            thumbnailUrl: video.ThumbNail || defaultThumbnail,
-            videoUrl: video.UploadedLocation,
-            description: video.VideoDescription,
-            watchedStatus: video.WatchedStatus,
-          })));
-    
-          setUnWatchedVideoData(unwatchedVideos.map(video => ({
-            id: video.VideoId,
-            title: video.VideoTitle,
-            thumbnailUrl: video.ThumbNail || defaultThumbnail, 
-            videoUrl: video.UploadedLocation,
-            description: video.VideoDescription,
-            watchedStatus: video.WatchedStatus,
-          })));
+          setWatchedVideoData(
+            watchedVideos.map(video => ({
+              id: video.VideoId,
+              title: video.VideoTitle,
+              thumbnailUrl: video.ThumbNail || defaultThumbnail,
+              videoUrl: video.UploadedLocation,
+              description: video.VideoDescription,
+              watchedStatus: video.WatchedStatus,
+            })),
+          );
+
+          setUnWatchedVideoData(
+            unwatchedVideos.map(video => ({
+              id: video.VideoId,
+              title: video.VideoTitle,
+              thumbnailUrl: video.ThumbNail || defaultThumbnail,
+              videoUrl: video.UploadedLocation,
+              description: video.VideoDescription,
+              watchedStatus: video.WatchedStatus,
+            })),
+          );
         } else
           alertMessagePopUp('Some thing went wrong',alertMessageType.DANGER.code);
       } else {
@@ -96,10 +105,20 @@ export default function Home({navigation}) {
     getVideoData();
   }, []);
 
+  const onRefresh = () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 2000);
+  };
+
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{paddingBottom: 20}}>
+      contentContainerStyle={{paddingBottom: 20}}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }>
       {/* Header */}
       <ImageBackground
         style={styles.imgback}
@@ -175,27 +194,29 @@ export default function Home({navigation}) {
         <Text style={styles.sectionTitle}>Latest Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.videoSection}>
-          {unWatchedVideoData.length > 0 ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.videoSection}>
-              {unWatchedVideoData.map(item => (
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={() => openVideo(item.videoUrl)}>
-                  <View style={styles.videoItem}>
-                    <Image
-                      style={styles.thumbNailImg}
-                      source={{uri: item.thumbnailUrl}}
-                    />
-                    <Text style={styles.videoTitle}>{item.title}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        ) : (
-          <Text style={styles.noDataText}>No videos available in this section.</Text>
-        )}
+            {unWatchedVideoData.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.videoSection}>
+                  {unWatchedVideoData.map(item => (
+                    <TouchableOpacity
+                      key={item.id}
+                      onPress={() => openVideo(item.videoUrl)}>
+                      <View style={styles.videoItem}>
+                        <Image
+                          style={styles.thumbNailImg}
+                          source={{uri: item.thumbnailUrl}}
+                        />
+                        <Text style={styles.videoTitle}>{item.title}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            ) : (
+              <Text style={styles.noDataText}>
+                No videos available in this section.
+              </Text>
+            )}
           </View>
         </ScrollView>
       </View>
@@ -206,27 +227,27 @@ export default function Home({navigation}) {
         <Text style={styles.sectionTitle}>Watched Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View style={styles.videoSection}>
-          {watchedVideoData.length > 0 ? (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.videoSection}>
-              {watchedVideoData.map(item => (
-                <TouchableOpacity
-                  key={item.id}
-                  onPress={() => openVideo(item.videoUrl)}>
-                  <View style={styles.videoItem}>
-                    <Image
-                      style={styles.thumbNailImg}
-                      source={{uri: item.thumbnailUrl}}
-                    />
-                    <Text style={styles.videoTitle}>{item.title}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </ScrollView>
-        ) : (
-          <Text style={styles.noDataText}>No videos watched yet.</Text>
-        )}
+            {watchedVideoData.length > 0 ? (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={styles.videoSection}>
+                  {watchedVideoData.map(item => (
+                    <TouchableOpacity
+                      key={item.id}
+                      onPress={() => openVideo(item.videoUrl)}>
+                      <View style={styles.videoItem}>
+                        <Image
+                          style={styles.thumbNailImg}
+                          source={{uri: item.thumbnailUrl}}
+                        />
+                        <Text style={styles.videoTitle}>{item.title}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </ScrollView>
+            ) : (
+              <Text style={styles.noDataText}>No videos watched yet.</Text>
+            )}
           </View>
         </ScrollView>
       </View>
