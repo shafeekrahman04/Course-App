@@ -9,6 +9,7 @@ import {
   Dimensions,
   StatusBar,
   ImageBackground,
+  BackHandler,
 } from 'react-native';
 import Video from 'react-native-video';
 import QuizModal from '../modal/QuizModal';
@@ -51,11 +52,24 @@ export default function VideoScreen({navigation}) {
     };
 
     Orientation.addOrientationListener(handleOrientation);
-    return () => {
-      Orientation.removeOrientationListener(handleOrientation);
-      Orientation.unlockAllOrientations();
+    const backAction = () =>{
+      if(fullscreen){
+        handleFullscreen();
+        return true;
+      }
+      return false;
     };
-  }, []);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+    return () => 
+      // {
+      // Orientation.removeOrientationListener(handleOrientation);
+      // Orientation.unlockAllOrientations();
+      backHandler.remove();
+    // };
+  }, [fullscreen]);
 
   const playVideo = (video, isEnd) => {
     setCurrentVideo(video);
@@ -300,10 +314,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 7,
-    gap: 10,
+    // gap: 10,
   },
   backButton: {
-    paddingHorizontal: 15,
+    // paddingHorizontal: 15,
   },
   title: {
     fontSize: 18,

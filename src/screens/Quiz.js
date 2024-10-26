@@ -71,6 +71,12 @@ const [refreshing, setRefreshing] = useState(false);
     }, 2000);
   }
 
+  const goBack = () => {
+    
+      navigation.goBack();
+    
+  };
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -79,7 +85,7 @@ const [refreshing, setRefreshing] = useState(false);
         source={require('../assets/logo/bg1.jpg')}
       >
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
+          <TouchableOpacity onPress={goBack} style={styles.backButton}>
             <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.title}>Ready to Quiz? Let’s Go</Text>
