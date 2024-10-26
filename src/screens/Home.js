@@ -26,7 +26,7 @@ export default function Home({navigation}) {
     VideoDescription: "",
     VideoUrl: "",
     WatchedStatus: "",
-    ThumbNail: ""
+    ThumbNail: "https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47"
   };
   const [refreshing, setRefreshing] = useState(false);
 

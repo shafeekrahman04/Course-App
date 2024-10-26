@@ -76,6 +76,7 @@ export default function VideoScreen({navigation,route}) {
   };
 
   useEffect(() => {
+    getVideoData();
     const handleOrientation = orientation => {
       setFullscreen(orientation.includes('LANDSCAPE'));
       StatusBar.setHidden(orientation.includes('LANDSCAPE'));
@@ -83,7 +84,6 @@ export default function VideoScreen({navigation,route}) {
 
     Orientation.addOrientationListener(handleOrientation);
     return () => {
-      getVideoData();
       Orientation.removeOrientationListener(handleOrientation);
       Orientation.unlockAllOrientations();
     };
