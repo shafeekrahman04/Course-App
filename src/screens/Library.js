@@ -16,15 +16,18 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { getDashboardData } from '../api/HomeApiService';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
+import { alertMessageType } from '../utilities/enum/Enum';
 
 export default function Library({navigation}) {
+ 
+
   const defualtVideoData = {
     VideoId: "",
     VideoTitle: "",
     VideoDescription: "",
     VideoUrl: "",
     WatchedStatus: "",
-    ThumbNail: ""
+    ThumbNail: "https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47"
   };
 
   const [refreshing, setRefreshing] = useState(false);
@@ -35,10 +38,12 @@ export default function Library({navigation}) {
     timestamp: Date.now(),
   });
   const [alertType, setAlertType] = useState('');
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
 
   const alertMessagePopUp = (message, messageType) => {
     setAlertMessage({message: message, timestamp: new Date()});
     setAlertType(messageType);
+    setIsAlertVisible(true);
   };
 
   const openVideo = item => {
@@ -51,7 +56,7 @@ export default function Library({navigation}) {
         <View style={styles.imageContainer}>
           <Image
             style={styles.thumbImg}
-            source={{uri: item.ThumbNail}}
+            source={{uri: item.ThumbNail }}
           />
           <TouchableOpacity
             style={styles.playCircleContainer}
@@ -88,7 +93,7 @@ export default function Library({navigation}) {
               VideoId: video.VideoId,
               VideoTitle: video.VideoTitle,
               ThumbNail: video.ThumbNail || defaultThumbnail,
-              videoUrl: video.UploadedLocation,
+              VideoUrl: video.UploadedLocation,
               VideoDescription: video.VideoDescription,
               WatchedStatus: video.WatchedStatus,
             })),
@@ -141,7 +146,9 @@ export default function Library({navigation}) {
         }
       />
       {/* Alert */}
+      {isAlertVisible && (
       <AlertMessage message={alertMessage} messageType={alertType} />
+    )}
 
       {/* loader */}
       <Modal visible={loader} transparent>

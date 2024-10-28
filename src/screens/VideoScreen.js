@@ -24,6 +24,7 @@ import quizQuestion from '../utilities/constant/QuizData';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
 import { getDashboardData } from '../api/HomeApiService';
+import { alertMessageType } from '../utilities/enum/Enum';
 
 const windowHeight = Dimensions.get('window').width * (9 / 16);
 const windowWidth = Dimensions.get('window').width;
@@ -39,7 +40,7 @@ export default function VideoScreen({navigation,route}) {
     VideoDescription: "",
     VideoUrl: "",
     WatchedStatus: "",
-    ThumbNail: ""
+    ThumbNail: "https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47"
   };
 
   const { item } = route.params; 
@@ -69,10 +70,13 @@ export default function VideoScreen({navigation,route}) {
     timestamp: Date.now(),
   });
   const [alertType, setAlertType] = useState('');
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
+
 
   const alertMessagePopUp = (message, messageType) => {
     setAlertMessage({message: message, timestamp: new Date()});
     setAlertType(messageType);
+    setIsAlertVisible(true);
   };
 
   useEffect(() => {
@@ -299,7 +303,7 @@ export default function VideoScreen({navigation,route}) {
             {/* Recommended Videos */}
             {!fullscreen && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Recommended Videos</Text>
+                <Text style={styles.sectionTitle}>Related Videos</Text>
                 <FlatList
                   data={recommendedVideo}
                   renderItem={({item}) => (
@@ -347,7 +351,9 @@ export default function VideoScreen({navigation,route}) {
       />
 
       {/* Alert */}
-      <AlertMessage message={alertMessage} messageType={alertType} />
+      {isAlertVisible && (
+      <AlertMessage message={alertMessage} messageType={alertType}  />
+    )}
 
       {/* loader */}
       <Modal visible={loader} transparent>
@@ -373,11 +379,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 7,
-    gap: 10,
+    // gap: 10,
   },
-  backButton: {
-    paddingHorizontal: 15,
-  },
+  // backButton: {
+  //   paddingHorizontal: 15,
+  // },
   title: {
     fontSize: 18,
     color: '#888',
