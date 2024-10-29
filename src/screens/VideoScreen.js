@@ -10,6 +10,7 @@ import {
   StatusBar,
   ImageBackground,
   Modal,
+  BackHandler,
 } from 'react-native';
 import Video from 'react-native-video';
 import QuizModal from '../modal/QuizModal';
@@ -87,11 +88,24 @@ export default function VideoScreen({navigation,route}) {
     };
 
     Orientation.addOrientationListener(handleOrientation);
-    return () => {
-      Orientation.removeOrientationListener(handleOrientation);
-      Orientation.unlockAllOrientations();
+    const backAction = () =>{
+      if(fullscreen){
+        handleFullscreen();
+        return true;
+      }
+      return false;
     };
-  }, []);
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction
+    );
+    return () => 
+      // {
+      // Orientation.removeOrientationListener(handleOrientation);
+      // Orientation.unlockAllOrientations();
+      backHandler.remove();
+    // };
+  }, [fullscreen]);
 
   const playVideo = (video, isEnd) => {
     setCurrentVideo(video);
