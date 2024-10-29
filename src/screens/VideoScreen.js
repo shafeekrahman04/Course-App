@@ -9,10 +9,7 @@ import {
   Dimensions,
   StatusBar,
   ImageBackground,
-<<<<<<< src/screens/VideoScreen.js
   Modal,
-=======
->>>>>>> src/screens/VideoScreen.js
   BackHandler,
 } from 'react-native';
 import Video from 'react-native-video';
@@ -397,8 +394,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 7,
     // gap: 10,
-<<<<<<< src/screens/VideoScreen.js
-=======
+
+
   },
 //   backButton: {
 //     // paddingHorizontal: 15,

@@ -86,7 +86,7 @@ export default function Library({navigation}) {
       setRefreshing(false);
     }, 2000);
   };
-
+ 
   const getVideoData = async () => {
     try {
       setLoader(true);
@@ -120,11 +120,7 @@ export default function Library({navigation}) {
     getVideoData();
   }, []);
 
-  const goBack = () => {
-    
-    navigation.goBack();
-  
-};
+ 
 
   return (
     <View style={styles.container}>
