@@ -50,6 +50,12 @@ export default function Library({navigation}) {
     navigation.navigate('VideoScreen', {item});
   };
 
+  const goBack = () => {
+   
+      navigation.goBack();
+   
+  };
+
   const renderVideoItem = ({item}) => (
     <TouchableOpacity onPress={() => openVideo(item)}>
       <View style={styles.recommendItem}>
@@ -121,7 +127,7 @@ export default function Library({navigation}) {
         style={styles.imgback}
         source={require('../assets/logo/bg1.jpg')}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.backButton}>
+          <TouchableOpacity onPress={goBack} style={styles.backButton}>
             <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.title}>Library</Text>
