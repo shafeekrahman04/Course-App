@@ -9,6 +9,7 @@ import {
   Dimensions,
   StatusBar,
   ImageBackground,
+  Modal,
   BackHandler,
 } from 'react-native';
 import Video from 'react-native-video';
@@ -20,8 +21,11 @@ import FullscreenOpen from '../utilities/svg/FullscreenOpen';
 import FullscreenClose from '../utilities/svg/FullscreenClose';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import VideoBack from '../utilities/svg/VideoBack';
-import videoData from '../utilities/constant/VideoData';
 import quizQuestion from '../utilities/constant/QuizData';
+import AlertMessage from '../shared/AlertMessage';
+import Loader from '../shared/Loader';
+import { getDashboardData } from '../api/HomeApiService';
+import { alertMessageType } from '../utilities/enum/Enum';
 
 const windowHeight = Dimensions.get('window').width * (9 / 16);
 const windowWidth = Dimensions.get('window').width;
@@ -29,9 +33,21 @@ const windowWidth = Dimensions.get('window').width;
 const height = Dimensions.get('window').width;
 const width = Dimensions.get('window').height;
 
-export default function VideoScreen({navigation}) {
+export default function VideoScreen({navigation,route}) {
+
+  const defualtRecommendedVideoData = {
+    VideoId: "",
+    VideoTitle: "",
+    VideoDescription: "",
+    VideoUrl: "",
+    WatchedStatus: "",
+    ThumbNail: "https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47"
+  };
+
+  const { item } = route.params; 
   const videoRef = useRef(null);
-  const [currentVideo, setCurrentVideo] = useState(videoData[0]);
+
+  const [currentVideo, setCurrentVideo] = useState(item);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isQuizButton, setIsQuizButton] = useState(false);
   const [isQuizModal, setIsQuizModal] = useState(false);
@@ -39,13 +55,33 @@ export default function VideoScreen({navigation}) {
   const [selectedAnswer, setSelectedAnswer] = useState(
     Array(quizQuestion.length).fill(null),
   );
+  
   const [isVideoEnded, setIsVideoEnded] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [fullscreen, setFullscreen] = useState(false);
   const [showControl, setShowControl] = useState(true);
 
+  const [recommendedVideo, setRecommendedVideo] = useState([defualtRecommendedVideoData]);
+
+  const [loader, setLoader] = useState(false); // loader
+
+  const [alertMessage, setAlertMessage] = useState({
+    message: '',
+    timestamp: Date.now(),
+  });
+  const [alertType, setAlertType] = useState('');
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
+
+
+  const alertMessagePopUp = (message, messageType) => {
+    setAlertMessage({message: message, timestamp: new Date()});
+    setAlertType(messageType);
+    setIsAlertVisible(true);
+  };
+
   useEffect(() => {
+    getVideoData();
     const handleOrientation = orientation => {
       setFullscreen(orientation.includes('LANDSCAPE'));
       StatusBar.setHidden(orientation.includes('LANDSCAPE'));
@@ -151,6 +187,35 @@ export default function VideoScreen({navigation}) {
     setIsPlaying(false);
   };
 
+  const getVideoData = async () => {
+    try {
+      setLoader(true);
+      const res = await getDashboardData();
+      if (res) {
+        if (res.data) {
+          const defaultThumbnail = 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47';
+          setRecommendedVideo(
+            res.data.map(video => ({
+              VideoId: video.VideoId,
+              VideoTitle: video.VideoTitle,
+              ThumbNail: video.ThumbNail || defaultThumbnail,
+              VideoUrl: video.UploadedLocation,
+              VideoDescription: video.VideoDescription,
+              WatchedStatus: video.WatchedStatus,
+            })),
+          );
+        } else
+          alertMessagePopUp('Some thing went wrong',alertMessageType.DANGER.code);
+      } else {
+        alertMessagePopUp('Some thing went wrong Please Try Again Later',alertMessageType.DANGER.code);
+      }
+      setLoader(false);
+    } catch (error) {
+      alertMessagePopUp(error.message, alertMessageType.DANGER.code);
+      console.error(error);
+    }
+  };
+
   return (
     <>
       {!fullscreen && (
@@ -166,7 +231,7 @@ export default function VideoScreen({navigation}) {
               />
             </TouchableOpacity>
 
-            <Text style={styles.title}>{currentVideo.title} </Text>
+            <Text style={styles.title}>{currentVideo.VideoTitle} </Text>
           </View>
         </ImageBackground>
       )}
@@ -184,7 +249,7 @@ export default function VideoScreen({navigation}) {
               <TouchableOpacity onPress={handleControls}>
                 <Video
                   ref={videoRef}
-                  source={{uri: currentVideo.uri}}
+                  source={{uri: currentVideo.VideoUrl}}
                   style={fullscreen ? styles.fullscreenVideo : styles.video}
                   controls={false}
                   resizeMode={'contain'}
@@ -238,8 +303,11 @@ export default function VideoScreen({navigation}) {
                 </View>
               )}
 
+              <Text style={styles.videoTitle}>
+                {currentVideo.VideoTitle}
+              </Text>
               <Text style={styles.videoDescription}>
-                {currentVideo.description}
+                {currentVideo.VideoDescription}
               </Text>
             </View>
           </>
@@ -249,16 +317,16 @@ export default function VideoScreen({navigation}) {
             {/* Recommended Videos */}
             {!fullscreen && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Recommended Videos</Text>
+                <Text style={styles.sectionTitle}>Related Videos</Text>
                 <FlatList
-                  data={videoData}
+                  data={recommendedVideo}
                   renderItem={({item}) => (
                     <TouchableOpacity onPress={() => playVideo(item)}>
-                      <View style={styles.recommendItem}>
+                      <View style={styles.videoItem}>
                         <View style={styles.imageContainer}>
                           <Image
-                            style={styles.recommendImage}
-                            source={{uri: item.thumbnailUrl}}
+                            style={styles.thumbNailImg}
+                            source={{uri: item.ThumbNail}}
                           />
                           <TouchableOpacity
                             style={styles.playCircleContainer}
@@ -269,15 +337,15 @@ export default function VideoScreen({navigation}) {
                           </TouchableOpacity>
                         </View>
                         <View style={styles.recommendDetails}>
-                          <Text style={styles.recommendText}>{item.title}</Text>
-                          <Text style={styles.recommendDescription}>
-                            {item.description}
+                          <Text style={styles.videoTitle}>{item.VideoTitle}</Text>
+                          <Text style={styles.videoDescription}>
+                            {item.VideoDescription}
                           </Text>
                         </View>
                       </View>
                     </TouchableOpacity>
                   )}
-                  keyExtractor={item => item.id}
+                  keyExtractor={item => item.VideoId}
                   showsVerticalScrollIndicator={false}
                 />
               </View>
@@ -295,6 +363,17 @@ export default function VideoScreen({navigation}) {
         selectedAnswers={selectedAnswer}
         setSelectedAnswer={setSelectedAnswer}
       />
+
+      {/* Alert */}
+      {isAlertVisible && (
+      <AlertMessage message={alertMessage} messageType={alertType}  />
+    )}
+
+      {/* loader */}
+      <Modal visible={loader} transparent>
+        <Loader />
+      </Modal>
+
     </>
   );
 }
@@ -315,10 +394,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 7,
     // gap: 10,
+
+
   },
-  backButton: {
-    // paddingHorizontal: 15,
-  },
+//   backButton: {
+//     // paddingHorizontal: 15,
+// >>>>>>> src/screens/VideoScreen.js
+//   },
+  // backButton: {
+  //   paddingHorizontal: 15,
+  // },
   title: {
     fontSize: 18,
     color: '#888',
@@ -448,7 +533,7 @@ const styles = StyleSheet.create({
   listContainer: {
     padding: 10,
   },
-  recommendItem: {
+  videoItem: {
     flexDirection: 'row',
     padding: 10,
     marginBottom: 10,
@@ -463,7 +548,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ccc',
     marginHorizontal: 10,
   },
-  recommendImage: {
+  thumbNailImg: {
     width: 110,
     height: 120,
     borderRadius: 8,
@@ -473,13 +558,13 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     justifyContent: 'center',
   },
-  recommendText: {
+  videoTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     color: '#333',
   },
-  recommendDescription: {
-    fontSize: 12,
+  videoDescription: {
+    fontSize: 14,
     color: '#666',
     marginTop: 5,
   },

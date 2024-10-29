@@ -21,18 +21,18 @@ import Loader from '../shared/Loader';
 
 export default function Home({navigation}) {
   const defualtVideoData = {
-    id: '',
-    title: '',
-    thumbnailUrl: '',
-    videoUrl: '',
-    description: '',
-    watchedStatus: '',
+    VideoId: "",
+    VideoTitle: "",
+    VideoDescription: "",
+    VideoUrl: "",
+    WatchedStatus: "",
+    ThumbNail: "https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47"
   };
   const [refreshing, setRefreshing] = useState(false);
 
   const authContext = useAuth();
-  const [watchedVideoData, setWatchedVideoData] = useState(defualtVideoData);
-  const [unWatchedVideoData, setUnWatchedVideoData] = useState(defualtVideoData);
+  const [watchedVideoData, setWatchedVideoData] = useState([defualtVideoData]);
+  const [unWatchedVideoData, setUnWatchedVideoData] = useState([defualtVideoData]);
   const [loader, setLoader] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     message: '',
@@ -45,8 +45,8 @@ export default function Home({navigation}) {
     setAlertType(messageType);
   };
 
-  const openVideo = videoUri => {
-    navigation.navigate('VideoScreen', {videoUri});
+  const openVideo = item => {
+    navigation.navigate('VideoScreen', {item});
   };
 
   function logoutHandler() {
@@ -70,23 +70,23 @@ export default function Home({navigation}) {
 
           setWatchedVideoData(
             watchedVideos.map(video => ({
-              id: video.VideoId,
-              title: video.VideoTitle,
-              thumbnailUrl: video.ThumbNail || defaultThumbnail,
-              videoUrl: video.UploadedLocation,
-              description: video.VideoDescription,
-              watchedStatus: video.WatchedStatus,
+              VideoId: video.VideoId,
+              VideoTitle: video.VideoTitle,
+              ThumbNail: video.ThumbNail || defaultThumbnail,
+              VideoUrl: video.UploadedLocation,
+              VideoDescription: video.VideoDescription,
+              WatchedStatus: video.WatchedStatus,
             })),
           );
 
           setUnWatchedVideoData(
             unwatchedVideos.map(video => ({
-              id: video.VideoId,
-              title: video.VideoTitle,
-              thumbnailUrl: video.ThumbNail || defaultThumbnail,
-              videoUrl: video.UploadedLocation,
-              description: video.VideoDescription,
-              watchedStatus: video.WatchedStatus,
+              VideoId: video.VideoId,
+              VideoTitle: video.VideoTitle,
+              ThumbNail: video.ThumbNail || defaultThumbnail,
+              VideoUrl: video.UploadedLocation,
+              VideoDescription: video.VideoDescription,
+              WatchedStatus: video.WatchedStatus,
             })),
           );
         } else
@@ -199,14 +199,14 @@ export default function Home({navigation}) {
                 <View style={styles.videoSection}>
                   {unWatchedVideoData.map(item => (
                     <TouchableOpacity
-                      key={item.id}
-                      onPress={() => openVideo(item.videoUrl)}>
+                      key={item.VideoId}
+                      onPress={() => openVideo(item)}>
                       <View style={styles.videoItem}>
                         <Image
                           style={styles.thumbNailImg}
-                          source={{uri: item.thumbnailUrl}}
+                          source={{uri: item.ThumbNail}}
                         />
-                        <Text style={styles.videoTitle}>{item.title}</Text>
+                        <Text style={styles.videoTitle}>{item.VideoTitle}</Text>
                       </View>
                     </TouchableOpacity>
                   ))}
@@ -232,14 +232,14 @@ export default function Home({navigation}) {
                 <View style={styles.videoSection}>
                   {watchedVideoData.map(item => (
                     <TouchableOpacity
-                      key={item.id}
-                      onPress={() => openVideo(item.videoUrl)}>
+                      key={item.VideoId}
+                      onPress={() => openVideo(item)}>
                       <View style={styles.videoItem}>
                         <Image
                           style={styles.thumbNailImg}
-                          source={{uri: item.thumbnailUrl}}
+                          source={{uri: item.ThumbNail}}
                         />
-                        <Text style={styles.videoTitle}>{item.title}</Text>
+                        <Text style={styles.videoTitle}>{item.VideoTitle}</Text>
                       </View>
                     </TouchableOpacity>
                   ))}
