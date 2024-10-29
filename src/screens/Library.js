@@ -120,6 +120,12 @@ export default function Library({navigation}) {
     getVideoData();
   }, []);
 
+  const goBack = () => {
+    
+    navigation.goBack();
+  
+};
+
   return (
     <View style={styles.container}>
       {/* Header */}
@@ -127,7 +133,7 @@ export default function Library({navigation}) {
         style={styles.imgback}
         source={require('../assets/logo/bg1.jpg')}>
         <View style={styles.header}>
-          <TouchableOpacity onPress={goBack} style={styles.backButton}>
+        <TouchableOpacity onPress={goBack} style={styles.backButton}>
             <Ionicons name="arrow-back-circle-outline" size={34} color="#fff" />
           </TouchableOpacity>
           <Text style={styles.title}>Library</Text>
