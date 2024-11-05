@@ -286,22 +286,22 @@ export default function VideoScreen({navigation,route}) {
                   </View>
                 )}
               </TouchableOpacity>
-              {isQuizButton && !isQuizSubmit && (
+              {/* {isQuizButton && !isQuizSubmit && (
                 <TouchableOpacity
                   style={styles.quizButton}
                   onPress={() => setIsQuizModal(true)}>
                   <Text style={styles.quizbtnText}>Take the Quiz</Text>
                 </TouchableOpacity>
-              )}
+              )} */}
             </View>
 
             {/* Video Details */}
             <View style={styles.videoDetails}>
-              {isVideoEnded && !isQuizSubmit && (
+              {/* {isVideoEnded && !isQuizSubmit && (
                 <View style={styles.quizIncomplete}>
                   <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
                 </View>
-              )}
+              )} */}
 
               <Text style={styles.videoTitle}>
                 {currentVideo.VideoTitle}

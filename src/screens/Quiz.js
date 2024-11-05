@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,56 +8,76 @@ import {
   ImageBackground,
   FlatList,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { getQuizDetails } from '../api/HomeApiService';
+import Loader from '../shared/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 // Sample quiz data
 
-const quizData = [
-  {
-    id: '1',
-    title: 'Cybersecurity Basics',
-    description: 'Test your knowledge about cybersecurity fundamentals.',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
-  },
-  {
-    id: '2',
-    title: 'Data Privacy Essentials',
-    description: 'How well do you understand data privacy?',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
 
-  },
-  {
-    id: '3',
-    title: 'Phishing Awareness',
-    description: 'Recognize phishing attacks and stay safe online.',
-    thumbnailUrl:
-      'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47',
-
-  },
-  // Add more quizzes as needed
-];
 
 export default function QuizScreen({ navigation }) {
-const [refreshing, setRefreshing] = useState(false);
+  
 
-  const openQuizForm = (quiz) => {
-    navigation.navigate('QuizDetails', { quiz });
+const [refreshing, setRefreshing] = useState(false);
+const [quizData, setQuizData] = useState([]);
+const [loading, setLoading] = useState(false);
+
+const fetchQuizList = async () => {
+  setLoading(true);
+  try {
+    const userId = await AsyncStorage.getItem("userId");
+    const res = await getQuizDetails(userId);
+    console.log('fetched quiz data:',res.data)
+    setQuizData(res.data); 
+  } catch (error) {
+    console.error('Failed to fetch quiz list:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+ useEffect(()=>{
+  fetchQuizList();
+ },[]);
+
+  const openQuizForm = async (quizId) => {
+    setLoading(true);
+    try{
+      const res = await getQuizDetails(quizId);
+      const quizDetails = res.data;
+      setLoading(false);
+      console.log('quizid:',quizId);
+      navigation.navigate('QuizDetails',{quizId});
+    }
+   catch(error){
+    setLoading(false);
+    console.error('Failed to fetch quiz details:', error);
+   }
   };
+  
 
   const renderQuizItem = ({ item }) => (
-    <TouchableOpacity onPress={() => openQuizForm(item)}>
+    <TouchableOpacity onPress={() => openQuizForm(item.QuizId)}>
       <View style={styles.quizItem}>
         <View style={styles.imageContainer}>
           {/* <Image style={styles.quizImage} source={{ uri: item.thumbnailUrl }} /> */}
         </View>
         <View style={styles.quizDetails}>
-          <Text style={styles.quizText}>{item.title}</Text>
-          <Text style={styles.quizDescription}>{item.description}</Text>
+        <View style={styles.titleContainer}>
+          <Text style={styles.quizText}>{item.QuizTitle}</Text>
+          {item.QuizAttendStatus === 'Attended' && (
+            <>
+            <Ionicons name="checkmark-circle" size={20} color="green" style={styles.attendedIcon} />
+            <Text>Complete</Text>
+            </>
+          )}
+        </View>
+          <Text style={styles.quizDescription}>{item.QuizDescription}</Text>
         </View>
         <Ionicons name="chevron-forward-outline" size={25} color="black" style={styles.iconStyle} />
       </View>
@@ -66,9 +86,7 @@ const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = () =>{
     setRefreshing(true);
-    setTimeout(()=>{
-      setRefreshing(false);
-    }, 2000);
+    fetchQuizList().finally(()=> setRefreshing(false));
   }
 
   const goBack = () => {
@@ -97,13 +115,16 @@ const [refreshing, setRefreshing] = useState(false);
       {/* List of quizzes */}
       <FlatList
         data={quizData}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.QuizId}
         renderItem={renderQuizItem}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>
         }
       />
-
+ {/* loader */}
+ <Modal visible={loading} transparent>
+        <Loader />
+      </Modal>
     </View>
   );
 }
@@ -217,5 +238,10 @@ const styles = StyleSheet.create({
   iconStyle: {
     marginLeft: 10,
   },
+  titleContainer:{
+    flexDirection:'row',
+    alignItems:'center',
+    gap:10
+  }
 });
 

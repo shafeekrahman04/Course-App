@@ -10,16 +10,16 @@ import {
   Modal,
   RefreshControl,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Ionicons';
-import {useAuth} from '../security/AuthContext';
-import {getDashboardData} from '../api/HomeApiService';
-import {alertMessageType} from '../utilities/enum/Enum';
+import { useAuth } from '../security/AuthContext';
+import { getDashboardData } from '../api/HomeApiService';
+import { alertMessageType } from '../utilities/enum/Enum';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
 
-export default function Home({navigation}) {
+export default function Home({ navigation }) {
   const defualtVideoData = {
     VideoId: "",
     VideoTitle: "",
@@ -29,7 +29,7 @@ export default function Home({navigation}) {
     ThumbNail: "https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47"
   };
   const [refreshing, setRefreshing] = useState(false);
-
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
   const authContext = useAuth();
   const [watchedVideoData, setWatchedVideoData] = useState([defualtVideoData]);
   const [unWatchedVideoData, setUnWatchedVideoData] = useState([defualtVideoData]);
@@ -41,17 +41,21 @@ export default function Home({navigation}) {
   const [alertType, setAlertType] = useState('');
 
   const alertMessagePopUp = (message, messageType) => {
-    setAlertMessage({message: message, timestamp: new Date()});
+    setAlertMessage({ message: message, timestamp: new Date() });
     setAlertType(messageType);
+    setIsAlertVisible(true);
   };
 
   const openVideo = item => {
-    navigation.navigate('VideoScreen', {item});
+    navigation.navigate('VideoScreen', { item });
   };
 
   function logoutHandler() {
     authContext.logout();
-    navigation.navigate('Login');
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'Login' }],
+    });
   }
 
   const getVideoData = async () => {
@@ -90,9 +94,9 @@ export default function Home({navigation}) {
             })),
           );
         } else
-          alertMessagePopUp('Some thing went wrong',alertMessageType.DANGER.code);
+          alertMessagePopUp('Some thing went wrong', alertMessageType.DANGER.code);
       } else {
-        alertMessagePopUp('Some thing went wrong Please Try Again Later',alertMessageType.DANGER.code);
+        alertMessagePopUp('Some thing went wrong Please Try Again Later', alertMessageType.DANGER.code);
       }
       setLoader(false);
     } catch (error) {
@@ -115,7 +119,7 @@ export default function Home({navigation}) {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={{paddingBottom: 20}}
+      contentContainerStyle={{ paddingBottom: 20 }}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }>
@@ -126,9 +130,9 @@ export default function Home({navigation}) {
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Hi, ALEX</Text>
           <Text style={styles.subText}>Let's start learning!</Text>
-          <TouchableOpacity style={styles.notificationIcon}>
+          {/* <TouchableOpacity style={styles.notificationIcon}>
             <Icon name="notifications-outline" size={25} color="#000" />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity style={styles.notificationIcon}>
             <Icon
               name="log-out-outline"
@@ -159,9 +163,13 @@ export default function Home({navigation}) {
           <View>
             <TouchableOpacity
               onPress={() =>
-                openVideo(
-                  'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/video%2FWhatsApp%20Video%202024-09-13%20at%205.25.47%20PM.mp4?alt=media&token=712f3f73-9b61-4c5a-97e9-7081dc161e33',
-                )
+                openVideo({
+                  VideoUrl: 'http://95.111.227.78:85/Videos/Sample3.mp4',
+                  VideoTitle: 'Road to Javascript Expert',
+                  VideoDescription: 'Part 1 • 20 Minutes',
+                  ThumbNail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
+                  WatchedStatus: 1
+                })
               }>
               <View style={styles.latestlearned}>
                 <Image
@@ -204,7 +212,7 @@ export default function Home({navigation}) {
                       <View style={styles.videoItem}>
                         <Image
                           style={styles.thumbNailImg}
-                          source={{uri: item.ThumbNail}}
+                          source={{ uri: item.ThumbNail }}
                         />
                         <Text style={styles.videoTitle}>{item.VideoTitle}</Text>
                       </View>
@@ -237,7 +245,7 @@ export default function Home({navigation}) {
                       <View style={styles.videoItem}>
                         <Image
                           style={styles.thumbNailImg}
-                          source={{uri: item.ThumbNail}}
+                          source={{ uri: item.ThumbNail }}
                         />
                         <Text style={styles.videoTitle}>{item.VideoTitle}</Text>
                       </View>
@@ -253,7 +261,9 @@ export default function Home({navigation}) {
       </View>
 
       {/* Alert */}
-      <AlertMessage message={alertMessage} messageType={alertType} />
+      {isAlertVisible && (
+        <AlertMessage message={alertMessage} messageType={alertType} />
+      )}
 
       {/* loader */}
       <Modal visible={loader} transparent>
@@ -314,7 +324,7 @@ const styles = StyleSheet.create({
     marginLeft: 20,
     marginRight: 20,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
     elevation: 5,
