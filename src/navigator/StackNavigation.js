@@ -9,6 +9,7 @@ import VideoScreen from '../screens/VideoScreen';
 import OnboardingScreen from '../screens/OnBoarding';
 import SplashScreen from '../screens/SplashScreen';
 import QuizDetails from '../modal/QuizDetails';
+import DocumentDetails from '../screens/DocumentDetails';
 
 const Stack = createStackNavigator();
 
@@ -80,6 +81,13 @@ export default function StackNavigation() {
         <Stack.Screen
           name="QuizDetails"
           component={QuizDetails}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="DocumentDetails"
+          component={DocumentDetails}
           options={{
             headerShown: false,
           }}

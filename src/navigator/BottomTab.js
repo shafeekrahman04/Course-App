@@ -6,6 +6,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Home from '../screens/Home';
 import Library from '../screens/Library';
 import Quiz from '../screens/Quiz';
+import Document from '../screens/Document';
 
 export default function BottomTab() {
   const TabNav = createBottomTabNavigator();
@@ -60,6 +61,20 @@ export default function BottomTab() {
           tabBarIcon: ({focused}) => (
             <Ionicons
               name={focused ? 'school' : 'school-outline'}
+              size={21}
+              color={focused ? '#0163d2' : 'grey'}
+            />
+          ),
+        }}
+      />
+      <TabNav.Screen
+        name="Document"
+        component={Document}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({focused}) => (
+            <Ionicons
+              name={focused ? 'document-text' : 'document-text-outline'}
               size={21}
               color={focused ? '#0163d2' : 'grey'}
             />
