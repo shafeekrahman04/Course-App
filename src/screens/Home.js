@@ -34,6 +34,7 @@ export default function Home({ navigation }) {
   const authContext = useAuth();
   const [watchedVideoData, setWatchedVideoData] = useState([defualtVideoData]);
   const [unWatchedVideoData, setUnWatchedVideoData] = useState([defualtVideoData]);
+  const [latestLearnedVideo, setLatestLearnedVideo] = useState([defualtVideoData]);
   const [loader, setLoader] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     message: '',
@@ -48,8 +49,9 @@ export default function Home({ navigation }) {
   };
 
   const openVideo = item => {
-    navigation.navigate('VideoScreen', { item });
-  };
+
+      navigation.navigate('VideoScreen', { item });
+   };
 
   function logoutHandler() {
     authContext.logout();
@@ -61,15 +63,22 @@ export default function Home({ navigation }) {
 
   const getVideoData = async () => {
     try {
-      const userId =await AsyncStorage.getItem('userId');
+      const userId = await AsyncStorage.getItem('userId');
+      const lastWatchedVideo = await AsyncStorage.getItem('latestWatchedVideo');
+      const parsedLastWatchedVideo = lastWatchedVideo ? JSON.parse(lastWatchedVideo) : null;
+
+      console.log('Last Watched Video:', parsedLastWatchedVideo);
+
+      console.log('UserID:', userId);
       setLoader(true);
       const res = await getDashboardData(userId);
-      
+
       if (res) {
         if (res.data) {
           const watchedVideos = res.data.filter(
             video => video.WatchedStatus === 1,
           );
+          console.log("Watched Videos:", watchedVideos);
           const unwatchedVideos = res.data.filter(
             video => video.WatchedStatus === 0,
           );
@@ -96,6 +105,9 @@ export default function Home({ navigation }) {
               WatchedStatus: video.WatchedStatus,
             })),
           );
+          if (parsedLastWatchedVideo) {
+            setLatestLearnedVideo(parsedLastWatchedVideo);
+          }
         } else
           alertMessagePopUp('Some thing went wrong', alertMessageType.DANGER.code);
       } else {
@@ -110,11 +122,12 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     getVideoData();
+    console.log("Watched Video Data Updated:", watchedVideoData);
   }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
-    getVideoData().finally(()=> setRefreshing(false));
+    getVideoData().finally(() => setRefreshing(false));
   };
 
   return (
@@ -164,28 +177,32 @@ export default function Home({ navigation }) {
           <View>
             <TouchableOpacity
               onPress={() =>
-                openVideo({
-                  VideoUrl: 'http://95.111.227.78:85/Videos/Sample3.mp4',
-                  VideoTitle: 'Road to Javascript Expert',
-                  VideoDescription: 'Part 1 • 20 Minutes',
-                  ThumbNail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
-                  WatchedStatus: 1
-                })
+                openVideo(latestLearnedVideo
+                //   {
+                //   VideoUrl: 'http://95.111.227.78:85/Videos/Sample3.mp4',
+                //   VideoTitle: 'Road to Javascript Expert',
+                //   VideoDescription: 'Part 1 • 20 Minutes',
+                //   ThumbNail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
+                //   WatchedStatus: 1
+                // }
+              )
               }>
               <View style={styles.latestlearned}>
                 <Image
                   style={styles.learnImg}
+                  resizeMode="cover"
                   source={{
-                    uri: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
+                    uri: latestLearnedVideo.ThumbNail || defualtVideoData.ThumbNail,
+                    // 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
                   }}
-                  blurRadius={5}
+                  blurRadius={2}
                 />
                 <View style={styles.learnedOverlay}>
                   <Text style={styles.learnedTitle}>
-                    Road to Javascript Expert
+                   {latestLearnedVideo.VideoTitle || 'Road to Javascript Expert'} 
                   </Text>
                   <Text style={styles.learnedSubtitle}>
-                    Part 1 • 20 Minutes
+                    {latestLearnedVideo.VideoDescription || 'Part 1 • 20 Minutes'}
                   </Text>
                 </View>
                 <View style={styles.playButton}>
@@ -252,7 +269,7 @@ export default function Home({ navigation }) {
                       </View>
                     </TouchableOpacity>
                   ))}
-                 </View>
+                </View>
               </ScrollView>
             ) : (
               <Text style={styles.noDataText}>No videos watched yet.</Text>
@@ -351,7 +368,7 @@ const styles = StyleSheet.create({
     bottom: 10,
   },
   learnedTitle: {
-    color: '#fff',
+    color: '#ddd',
     fontSize: 18,
     fontWeight: 'bold',
     paddingBottom: 5,

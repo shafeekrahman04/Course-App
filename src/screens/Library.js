@@ -46,8 +46,9 @@ export default function Library({navigation}) {
     setIsAlertVisible(true);
   };
 
-  const openVideo = item => {
-    navigation.navigate('VideoScreen', {item});
+  const openVideo = async (item) => {
+    navigation.navigate('VideoScreen', { item });
+    
   };
 
   const goBack = () => {
@@ -82,9 +83,7 @@ export default function Library({navigation}) {
 
   const onRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    getVideoData().finally(() => setRefreshing(false));
   };
  
   const getVideoData = async () => {

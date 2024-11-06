@@ -115,6 +115,7 @@ export default function VideoScreen({navigation,route}) {
       const userId = await AsyncStorage.getItem('userId');
       if (userId && video?.VideoId) {
          videoWatchedStatus(userId, video.VideoId);
+         await AsyncStorage.setItem('latestWatchedVideo',JSON.stringify(video))
       } else {
         console.warn('User ID or Video ID is missing');
       }
