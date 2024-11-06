@@ -70,7 +70,7 @@ const fetchQuizList = async () => {
         <View style={styles.quizDetails}>
         <View style={styles.titleContainer}>
           <Text style={styles.quizText}>{item.QuizTitle}</Text>
-          {item.QuizAttendStatus === 'Attended' && (
+          {item.QuizAttendStatus === 1 && (
             <>
             <Ionicons name="checkmark-circle" size={20} color="green" style={styles.attendedIcon} />
             <Text>Complete</Text>
