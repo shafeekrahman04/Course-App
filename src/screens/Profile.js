@@ -19,7 +19,7 @@ function logoutHandler() {
   const profileOptions = [
     { id: '1', title: 'First Name', value: user?.User_FirstNameEn, icon: 'person' },
     { id: '2', title: 'Last Name', value: user?.User_LastNameAr, icon: 'person' },
-    { id: '3', title: 'User ID', value: user?.USER_Id, icon: 'id-card' },
+    // { id: '3', title: 'User ID', value: user?.USER_Id, icon: 'id-card' },
     // { id: '4', title: 'Employee ID', value: user?.Emp_Id, icon: 'business' },
     // { id: '5', title: 'Is Logged In', value: user?.USER_IsLoggedIn ? 'Yes' : 'No', icon: 'log-in' },
     // { id: '6', title: 'Login Group ID', value: user?.LoginGroupID, icon: 'people' },
