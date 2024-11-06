@@ -24,8 +24,9 @@ import VideoBack from '../utilities/svg/VideoBack';
 import quizQuestion from '../utilities/constant/QuizData';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
-import { getDashboardData } from '../api/HomeApiService';
+import { getDashboardData, videoWatchedStatus } from '../api/HomeApiService';
 import { alertMessageType } from '../utilities/enum/Enum';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const windowHeight = Dimensions.get('window').width * (9 / 16);
 const windowWidth = Dimensions.get('window').width;
@@ -82,12 +83,14 @@ export default function VideoScreen({navigation,route}) {
 
   useEffect(() => {
     getVideoData();
+    markVideoAsWatched(currentVideo);
     const handleOrientation = orientation => {
       setFullscreen(orientation.includes('LANDSCAPE'));
       StatusBar.setHidden(orientation.includes('LANDSCAPE'));
     };
 
     Orientation.addOrientationListener(handleOrientation);
+    setIsPlaying(true);
     const backAction = () =>{
       if(fullscreen){
         handleFullscreen();
@@ -105,9 +108,28 @@ export default function VideoScreen({navigation,route}) {
       // Orientation.unlockAllOrientations();
       backHandler.remove();
     // };
-  }, [fullscreen]);
+  }, [fullscreen, currentVideo]);
 
-  const playVideo = (video, isEnd) => {
+  const markVideoAsWatched = async (video) => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      console.log('UserID:', userId);
+      if (userId && video?.VideoId) {
+        console.log('VideoID:', video.VideoId);
+         videoWatchedStatus(userId, video.VideoId);
+        console.log('Video watched status sent successfully');
+      } else {
+        console.warn('User ID or Video ID is missing');
+      }
+    } catch (error) {
+      console.error('Failed to update video watched status:', error);
+     
+    }
+  };
+
+
+  const playVideo =async (video, isEnd) => {
+   
     setCurrentVideo(video);
     setIsPlaying(true);
     setIsQuizButton(false);
@@ -118,6 +140,7 @@ export default function VideoScreen({navigation,route}) {
       setCurrentTime(0);
       videoRef.current.seek(0);
     }
+    markVideoAsWatched(currentVideo);
   };
 
   const handleVideoEnd = () => {

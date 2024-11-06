@@ -18,6 +18,7 @@ import { getDashboardData } from '../api/HomeApiService';
 import { alertMessageType } from '../utilities/enum/Enum';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home({ navigation }) {
   const defualtVideoData = {
@@ -60,13 +61,17 @@ export default function Home({ navigation }) {
 
   const getVideoData = async () => {
     try {
+      const userId =await AsyncStorage.getItem('userId');
+      console.log('UserID:', userId);
       setLoader(true);
-      const res = await getDashboardData();
+      const res = await getDashboardData(userId);
+      
       if (res) {
         if (res.data) {
           const watchedVideos = res.data.filter(
             video => video.WatchedStatus === 1,
           );
+          console.log("Watched Videos:", watchedVideos);
           const unwatchedVideos = res.data.filter(
             video => video.WatchedStatus === 0,
           );
@@ -107,13 +112,12 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     getVideoData();
+    console.log("Watched Video Data Updated:", watchedVideoData);
   }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 2000);
+    getVideoData().finally(()=> setRefreshing(false));
   };
 
   return (
@@ -251,7 +255,7 @@ export default function Home({ navigation }) {
                       </View>
                     </TouchableOpacity>
                   ))}
-                </View>
+                 </View>
               </ScrollView>
             ) : (
               <Text style={styles.noDataText}>No videos watched yet.</Text>
