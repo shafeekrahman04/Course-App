@@ -13,8 +13,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { getQuizDetails, quizSave } from '../api/HomeApiService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const QuizDetails = ({navigation, route}) => {
-  const {quizId} = route.params;
+const QuizDetails = ({ navigation, route }) => {
+  const { quizId } = route.params;
   const [refreshing, setRefreshing] = useState(false);
   const [loader, setLoader] = useState(false);
   const [quizData, setQuizData] = useState({ QuestionAnswerDetails: [] });
@@ -24,18 +24,17 @@ const QuizDetails = ({navigation, route}) => {
   const fetchQuizData = async () => {
     try {
       setLoader(true);
-      
+
       const userId = await AsyncStorage.getItem('userId');
       const res = await getQuizDetails(userId);
-      const quiz =res.data.find(quiz => quiz.QuizId === quizId)
-      // console.log('API Response:',quiz);
-      if(quiz)
-      {
+      const quiz = res.data.find(quiz => quiz.QuizId === quizId)
+      if (quiz) {
         setQuizData(quiz);
-      setIsQuizAttended(quiz.QuizAttendStatus === 'Attended');
-      // if(quiz.QuizAttendStatus === 'Attended'){
-      //   setSelectedAnswers(quiz.QuestionAnswerDetails.map(q => q.Answer));
-      // }
+        setIsQuizAttended(quiz.QuizAttendStatus === 1);
+        setSelectedAnswers(Array(quiz.QuestionAnswerDetails.length).fill(null))
+        // if(quiz.QuizAttendStatus === 'Attended'){
+        //   setSelectedAnswers(quiz.QuestionAnswerDetails.map(q => q.Answer));
+        // }
       }
     } catch (error) {
       console.error('Failed to fetch quiz:', error);
@@ -57,20 +56,19 @@ const QuizDetails = ({navigation, route}) => {
   };
 
   const handleQuizSubmit = async () => {
-   
+
     const userId = await AsyncStorage.getItem('userId');
     const correctAnswer = quizData.QuestionAnswerDetails.map(q => q.Answer);
     const isCorrect = selectedAnswers.every((answer, index) => answer === correctAnswer[index]);
 
-    const submissionData={
-      quizId,userId
+    const submissionData = {
+      quizId, userId
     };
-   Alert.alert(
+    Alert.alert(
       isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect',);
-      const res =await quizSave(submissionData);
-    console.log('quiz data:',submissionData);
+    const res = await quizSave(submissionData);
     // try{
-      
+
     //   const res =await quizSave(submissionData);
     //   if(res.success){
     //    Alert.alert('Success', 'Quiz completed successfully!');
@@ -111,16 +109,16 @@ const QuizDetails = ({navigation, route}) => {
               )}
             </View>
             <Text style={[styles.optionText,
-              isQuizAttended && styles.disabledOptionText,
+            isQuizAttended && styles.disabledOptionText,
             ]}>{option}</Text>
           </TouchableOpacity>
         ))}
       </View>
       {isQuizAttended && (
-         <View style={styles.answerContainer}>
-         <Text style={styles.answerTitleText}>Answer: </Text>
-         <Text style={styles.answerText}>{item.Answer}</Text>
-       </View>
+        <View style={styles.answerContainer}>
+          <Text style={styles.answerTitleText}>Answer: </Text>
+          <Text style={styles.answerText}>{item.Answer}</Text>
+        </View>
       )}
     </View>
   );
@@ -132,6 +130,9 @@ const QuizDetails = ({navigation, route}) => {
       setRefreshing(false);
     }, 2000);
   };
+
+  // check all ques is answer
+  const isQuizComplete = selectedAnswers.every((answer) => answer !== null)
 
   return (
     <View style={styles.container}>
@@ -150,15 +151,25 @@ const QuizDetails = ({navigation, route}) => {
       <FlatList
         data={quizData.QuestionAnswerDetails}
         renderItem={renderQuestionItem}
-        keyExtractor={(item) => item.QAID.toString()} 
+        keyExtractor={(item) => item.QAID.toString()}
         style={styles.flatList}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       />
-      {!isQuizAttended && (
-      <TouchableOpacity style={styles.submitQuizbtn} onPress={handleQuizSubmit} disabled={isQuizAttended}>
-        <Text style={styles.submitQuizTxt}>Submit Quiz</Text>
+
+      <TouchableOpacity
+        style={[
+          isQuizComplete ? styles.submitQuizbtn : styles.disableSubmit,
+          isQuizAttended && styles.quizAnsweredBtn
+        ]}
+        onPress={handleQuizSubmit}
+        disabled={!isQuizComplete || isQuizAttended}>
+        <Text style={[styles.submitQuizTxt,
+          //  isQuizAttended && styles.quizAttendColor
+           ]}>
+          {isQuizAttended ? 'Quiz Answered' : 'Submit Quiz'}
+        </Text>
       </TouchableOpacity>
-      )}
+
     </View>
   );
 };
@@ -190,8 +201,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     color: '#888',
-    flex:1,
-    textAlign:'center'
+    flex: 1,
+    textAlign: 'center'
   },
   quesContainer: {
     marginBottom: 10,
@@ -201,6 +212,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+    color:'#5A5A5A'
   },
   optionsContainer: {
     flexDirection: 'row',
@@ -240,7 +252,21 @@ const styles = StyleSheet.create({
   },
   submitQuizbtn: {
     backgroundColor: '#ffc100',
-    paddingVertical: 10,
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  quizAnsweredBtn: {
+    backgroundColor: '#4BB543'
+  },
+  quizAttendColor: {
+    color: '#48494b',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  disableSubmit: {
+    backgroundColor: 'grey',
+    paddingVertical: 15,
     paddingHorizontal: 20,
     alignItems: 'center',
   },
@@ -249,27 +275,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 16,
   },
-  answerTitleText:{
-    color:'green',
-    marginTop:5,
-    fontSize:18,
-    fontWeight:'bold'
+  answerTitleText: {
+    color: 'green',
+    marginTop: 5,
+    fontSize: 18,
+    fontWeight: 'bold'
   },
-  answerText:{
-    color:'#1d1160',
-    marginTop:5,
-    fontSize:18,
-    fontWeight:'bold'
+  answerText: {
+    color: '#1d1160',
+    marginTop: 5,
+    fontSize: 18,
+    fontWeight: 'bold'
   },
   disabledOption: {
-    backgroundColor: '#d3d3d3', 
+    backgroundColor: '#d3d3d3',
   },
   disabledOptionText: {
-    color: '#808080', 
-   
+    color: '#808080',
+
   },
-  answerContainer:{
-    flexDirection:'row'
+  answerContainer: {
+    flexDirection: 'row'
   },
 });
 

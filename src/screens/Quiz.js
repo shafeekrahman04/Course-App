@@ -33,7 +33,6 @@ const fetchQuizList = async () => {
   try {
     const userId = await AsyncStorage.getItem("userId");
     const res = await getQuizDetails(userId);
-    console.log('fetched quiz data:',res.data)
     setQuizData(res.data); 
   } catch (error) {
     console.error('Failed to fetch quiz list:', error);
@@ -51,7 +50,6 @@ const fetchQuizList = async () => {
       const res = await getQuizDetails(quizId);
       const quizDetails = res.data;
       setLoading(false);
-      console.log('quizid:',quizId);
       navigation.navigate('QuizDetails',{quizId});
     }
    catch(error){
@@ -70,7 +68,7 @@ const fetchQuizList = async () => {
         <View style={styles.quizDetails}>
         <View style={styles.titleContainer}>
           <Text style={styles.quizText}>{item.QuizTitle}</Text>
-          {item.QuizAttendStatus === 'Attended' && (
+          {item.QuizAttendStatus === 1 && (
             <>
             <Ionicons name="checkmark-circle" size={20} color="green" style={styles.attendedIcon} />
             <Text>Complete</Text>
