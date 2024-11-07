@@ -248,7 +248,7 @@ export default function Home({ navigation }) {
       </View>
 
       {/* Watched Video */}
-
+{watchedVideoData.length > 0 && (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Watched Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -277,7 +277,7 @@ export default function Home({ navigation }) {
           </View>
         </ScrollView>
       </View>
-
+)}
       {/* Alert */}
       {isAlertVisible && (
         <AlertMessage message={alertMessage} messageType={alertType} />
