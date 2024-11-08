@@ -66,10 +66,6 @@ export default function Home({ navigation }) {
       const userId = await AsyncStorage.getItem('userId');
       const lastWatchedVideo = await AsyncStorage.getItem('latestWatchedVideo');
       const parsedLastWatchedVideo = lastWatchedVideo ? JSON.parse(lastWatchedVideo) : null;
-
-      console.log('Last Watched Video:', parsedLastWatchedVideo);
-
-      console.log('UserID:', userId);
       setLoader(true);
       const res = await getDashboardData(userId);
 
@@ -78,7 +74,6 @@ export default function Home({ navigation }) {
           const watchedVideos = res.data.filter(
             video => video.WatchedStatus === 1,
           );
-          console.log("Watched Videos:", watchedVideos);
           const unwatchedVideos = res.data.filter(
             video => video.WatchedStatus === 0,
           );
@@ -122,7 +117,7 @@ export default function Home({ navigation }) {
 
   useEffect(() => {
     getVideoData();
-    console.log("Watched Video Data Updated:", watchedVideoData);
+    
   }, []);
 
   const onRefresh = () => {
@@ -144,9 +139,6 @@ export default function Home({ navigation }) {
         <View style={styles.header}>
           <Text style={styles.welcomeText}>Hi, ALEX</Text>
           <Text style={styles.subText}>Let's start learning!</Text>
-          {/* <TouchableOpacity style={styles.notificationIcon}>
-            <Icon name="notifications-outline" size={25} color="#000" />
-          </TouchableOpacity> */}
           <TouchableOpacity style={styles.notificationIcon}>
             <Icon
               name="log-out-outline"
@@ -177,15 +169,7 @@ export default function Home({ navigation }) {
           <View>
             <TouchableOpacity
               onPress={() =>
-                openVideo(latestLearnedVideo
-                //   {
-                //   VideoUrl: 'http://95.111.227.78:85/Videos/Sample3.mp4',
-                //   VideoTitle: 'Road to Javascript Expert',
-                //   VideoDescription: 'Part 1 • 20 Minutes',
-                //   ThumbNail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
-                //   WatchedStatus: 1
-                // }
-              )
+                openVideo(latestLearnedVideo)
               }>
               <View style={styles.latestlearned}>
                 <Image
@@ -193,7 +177,7 @@ export default function Home({ navigation }) {
                   resizeMode="cover"
                   source={{
                     uri: latestLearnedVideo.ThumbNail || defualtVideoData.ThumbNail,
-                    // 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-1.webp?alt=media&token=86a19147-9d69-45da-98c0-677546db5a7e',
+                   
                   }}
                   blurRadius={2}
                 />

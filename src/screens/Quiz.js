@@ -63,7 +63,6 @@ const fetchQuizList = async () => {
     <TouchableOpacity onPress={() => openQuizForm(item.QuizId)}>
       <View style={styles.quizItem}>
         <View style={styles.imageContainer}>
-          {/* <Image style={styles.quizImage} source={{ uri: item.thumbnailUrl }} /> */}
         </View>
         <View style={styles.quizDetails}>
         <View style={styles.titleContainer}>
