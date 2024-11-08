@@ -19,16 +19,9 @@ function logoutHandler() {
   const profileOptions = [
     { id: '1', title: 'First Name', value: user?.User_FirstNameEn, icon: 'person' },
     { id: '2', title: 'Last Name', value: user?.User_LastNameAr, icon: 'person' },
-    // { id: '3', title: 'User ID', value: user?.USER_Id, icon: 'id-card' },
-    // { id: '4', title: 'Employee ID', value: user?.Emp_Id, icon: 'business' },
-    // { id: '5', title: 'Is Logged In', value: user?.USER_IsLoggedIn ? 'Yes' : 'No', icon: 'log-in' },
-    // { id: '6', title: 'Login Group ID', value: user?.LoginGroupID, icon: 'people' },
-    { id: '7', title: 'Active Status', value: user?.IsActive ? 'Yes' : 'No', icon: 'checkmark-circle' },
-    // { id: '8', title: 'Branch ID', value: user?.USER_BranchId, icon: 'location' },
-    // { id: '9', title: 'Language ID', value: user?.USER_LanguageId, icon: 'language' },
-    // { id: '10', title: 'Last Updated Date', value: user?.User_LastUpdatedDate, icon: 'time' },
-    { id: '11', title: 'School Name', value: user?.SchoolName, icon: 'school' },
-    { id: '12', title: 'Logout', value: '', icon: 'log-out', isLogout: true },
+    { id: '3', title: 'Active Status', value: user?.IsActive ? 'Yes' : 'No', icon: 'checkmark-circle' },
+    { id: '4', title: 'School Name', value: user?.SchoolName, icon: 'school' },
+    { id: '5', title: 'Logout', value: '', icon: 'log-out', isLogout: true },
   ];
 
 
@@ -37,10 +30,10 @@ function logoutHandler() {
     <TouchableOpacity style={styles.optionContainer} onPress={item.isLogout ? logoutHandler : null}>
       <Icon name={item.icon} size={24} color="#999" style={styles.optionIcon} />
       <Text style={styles.optionText}>{item.title} </Text> 
-      {/* <View style={styles.rightContainer}> */}
+      
          <Text style={styles.optionValue}>{item.value}</Text>
          
-      {/* </View> */}
+     
     </TouchableOpacity>
   );
 
@@ -58,7 +51,7 @@ function logoutHandler() {
             style={styles.profileImage}
           />
           <Text style={styles.profileName}>{user?user.User_FirstNameEn:'Loading'}</Text>
-          {/* <Text style={styles.profileEmail}>andrew_ainsley@yourdomain.com</Text> */}
+          
         </View>
       </ImageBackground>
       <FlatList
@@ -67,9 +60,7 @@ function logoutHandler() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContainer}
       />
-      {/* <TouchableOpacity style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </TouchableOpacity> */}
+      
     </View>
   );
 };

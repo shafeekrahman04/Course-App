@@ -32,9 +32,6 @@ const QuizDetails = ({ navigation, route }) => {
         setQuizData(quiz);
         setIsQuizAttended(quiz.QuizAttendStatus === 1);
         setSelectedAnswers(Array(quiz.QuestionAnswerDetails.length).fill(null))
-        // if(quiz.QuizAttendStatus === 'Attended'){
-        //   setSelectedAnswers(quiz.QuestionAnswerDetails.map(q => q.Answer));
-        // }
       }
     } catch (error) {
       console.error('Failed to fetch quiz:', error);
@@ -67,20 +64,6 @@ const QuizDetails = ({ navigation, route }) => {
     Alert.alert(
       isCorrect ? 'Quiz completed successfully!' : 'Some answer are incorrect',);
     const res = await quizSave(submissionData);
-    // try{
-
-    //   const res =await quizSave(submissionData);
-    //   if(res.success){
-    //    Alert.alert('Success', 'Quiz completed successfully!');
-    //    setIsQuizAttended(true);
-    //   }else {
-    //     Alert.alert('Error','Failed to submit quiz')
-    //   }
-    // }catch{
-    //   console.log('Error submitting quiz:',error);
-    //   alert('Error', 'something went wrong');
-    // }
-    // setIsQuizAttended(true);
     setTimeout(() => {
       navigation.navigate('Quiz');
     }, 2000);
@@ -164,7 +147,6 @@ const QuizDetails = ({ navigation, route }) => {
         onPress={handleQuizSubmit}
         disabled={!isQuizComplete || isQuizAttended}>
         <Text style={[styles.submitQuizTxt,
-          //  isQuizAttended && styles.quizAttendColor
            ]}>
           {isQuizAttended ? 'Quiz Answered' : 'Submit Quiz'}
         </Text>

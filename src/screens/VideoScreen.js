@@ -103,11 +103,7 @@ export default function VideoScreen({navigation,route}) {
       backAction
     );
     return () => 
-      // {
-      // Orientation.removeOrientationListener(handleOrientation);
-      // Orientation.unlockAllOrientations();
       backHandler.remove();
-    // };
   }, [fullscreen, currentVideo]);
 
   const markVideoAsWatched = async (video) => {
@@ -115,6 +111,7 @@ export default function VideoScreen({navigation,route}) {
       const userId = await AsyncStorage.getItem('userId');
       if (userId && video?.VideoId) {
          videoWatchedStatus(userId, video.VideoId);
+         await AsyncStorage.setItem('latestWatchedVideo',JSON.stringify(video))
       } else {
         console.warn('User ID or Video ID is missing');
       }
@@ -306,23 +303,11 @@ export default function VideoScreen({navigation,route}) {
                   </View>
                 )}
               </TouchableOpacity>
-              {/* {isQuizButton && !isQuizSubmit && (
-                <TouchableOpacity
-                  style={styles.quizButton}
-                  onPress={() => setIsQuizModal(true)}>
-                  <Text style={styles.quizbtnText}>Take the Quiz</Text>
-                </TouchableOpacity>
-              )} */}
+             
             </View>
 
             {/* Video Details */}
             <View style={styles.videoDetails}>
-              {/* {isVideoEnded && !isQuizSubmit && (
-                <View style={styles.quizIncomplete}>
-                  <Text style={styles.incompleteTxt}>Quiz not Complete</Text>
-                </View>
-              )} */}
-
               <Text style={styles.videoTitle}>
                 {currentVideo.VideoTitle}
               </Text>
@@ -417,13 +402,6 @@ const styles = StyleSheet.create({
 
 
   },
-//   backButton: {
-//     // paddingHorizontal: 15,
-// >>>>>>> src/screens/VideoScreen.js
-//   },
-  // backButton: {
-  //   paddingHorizontal: 15,
-  // },
   title: {
     fontSize: 18,
     color: '#888',
