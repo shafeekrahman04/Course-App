@@ -56,7 +56,7 @@ export default function DocumentDetails({route, navigation}) {
           <Text style={styles.title}>Document</Text>
         </View>
         <Text style={styles.titling}>
-          Improve your skills with these quizzes.
+          Expand Your Knowledge with These Resources.
         </Text>
       </ImageBackground>
 

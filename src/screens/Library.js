@@ -135,7 +135,7 @@ export default function Library({navigation}) {
         </View>
       </ImageBackground>
       {/*Search bar*/}
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <Icon
           name="search-outline"
           size={20}
@@ -143,7 +143,7 @@ export default function Library({navigation}) {
           style={styles.searchicon}
         />
         <TextInput style={styles.searchInput} placeholder="Search" />
-      </View>
+      </View> */}
       <FlatList
         data={videoData}
         keyExtractor={item => item.VideoId}

@@ -114,7 +114,7 @@ export default function Document({navigation}) {
           </TouchableOpacity>
           <Text style={styles.title}>Document</Text>
         </View>
-        <Text style={styles.titling}>Improve your skills with these docs.</Text>
+        <Text style={styles.titling}>Expand Your Knowledge with These Resources.</Text>
       </ImageBackground>
 
       <ScrollView
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: 15,
-    marginTop: 12,
+    // marginTop: 0,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   titling: {
     fontSize: 16,
-    color: '#fff',
+    color: '#000',
     textAlign: 'center',
   },
   listContainer: {

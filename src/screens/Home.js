@@ -21,6 +21,7 @@ import Loader from '../shared/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Home({ navigation }) {
+  const {user} = useAuth();
   const defualtVideoData = {
     VideoId: "",
     VideoTitle: "",
@@ -137,7 +138,7 @@ export default function Home({ navigation }) {
         style={styles.imgback}
         source={require('../assets/logo/bg1.jpg')}>
         <View style={styles.header}>
-          <Text style={styles.welcomeText}>Hi, ALEX</Text>
+          <Text style={styles.welcomeText}>Hi, {user?user.User_FirstNameEn:'Loading'}</Text>
           <Text style={styles.subText}>Let's start learning!</Text>
           <TouchableOpacity style={styles.notificationIcon}>
             <Icon
@@ -152,7 +153,7 @@ export default function Home({ navigation }) {
 
       {/* Search Bar */}
 
-      <View style={styles.searchContainer}>
+      {/* <View style={styles.searchContainer}>
         <Icon
           name="search-outline"
           size={20}
@@ -160,7 +161,7 @@ export default function Home({ navigation }) {
           style={styles.searchicon}
         />
         <TextInput style={styles.searchInput} placeholder="Search" />
-      </View>
+      </View> */}
 
       {/*Latest Learned*/}
       <View style={styles.section}>
@@ -199,7 +200,7 @@ export default function Home({ navigation }) {
       </View>
 
       {/* Latest Video */}
-
+{unWatchedVideoData.length > 0 && (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Latest Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -230,7 +231,7 @@ export default function Home({ navigation }) {
           </View>
         </ScrollView>
       </View>
-
+)}
       {/* Watched Video */}
 {watchedVideoData.length > 0 && (
       <View style={styles.section}>
@@ -302,6 +303,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingVertical:15
   },
   welcomeText: {
     fontSize: 24,
