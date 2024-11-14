@@ -28,14 +28,14 @@ export default function Home({ navigation }) {
     VideoDescription: "",
     VideoUrl: "",
     WatchedStatus: "",
-    ThumbNail: "https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47"
+    ThumbNail: 'https://firebasestorage.googleapis.com/v0/b/fir-3b89d.appspot.com/o/thumbnail%2Fthumb-2.jpg?alt=media&token=1af14000-8393-4dba-b878-e59467d98f47'
   };
   const [refreshing, setRefreshing] = useState(false);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const authContext = useAuth();
-  const [watchedVideoData, setWatchedVideoData] = useState([defualtVideoData]);
-  const [unWatchedVideoData, setUnWatchedVideoData] = useState([defualtVideoData]);
-  const [latestLearnedVideo, setLatestLearnedVideo] = useState([defualtVideoData]);
+  const [watchedVideoData, setWatchedVideoData] = useState([]);
+  const [unWatchedVideoData, setUnWatchedVideoData] = useState([]);
+  const [latestLearnedVideo, setLatestLearnedVideo] = useState([]);
   const [loader, setLoader] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     message: '',
@@ -84,7 +84,7 @@ export default function Home({ navigation }) {
             watchedVideos.map(video => ({
               VideoId: video.VideoId,
               VideoTitle: video.VideoTitle,
-              ThumbNail: video.ThumbNail || defaultThumbnail,
+              ThumbNail: video.ThumbNail,
               VideoUrl: video.UploadedLocation,
               VideoDescription: video.VideoDescription,
               WatchedStatus: video.WatchedStatus,
@@ -95,14 +95,28 @@ export default function Home({ navigation }) {
             unwatchedVideos.map(video => ({
               VideoId: video.VideoId,
               VideoTitle: video.VideoTitle,
-              ThumbNail: video.ThumbNail || defaultThumbnail,
+              ThumbNail: video.ThumbNail ,
               VideoUrl: video.UploadedLocation,
               VideoDescription: video.VideoDescription,
               WatchedStatus: video.WatchedStatus,
             })),
           );
+          //set recently watched video
           if (parsedLastWatchedVideo) {
+            const videoExist = res.data.some(video => video.VideoId === parsedLastWatchedVideo.VideoId);
+            if(videoExist){
             setLatestLearnedVideo(parsedLastWatchedVideo);
+          } else {
+            AsyncStorage.removeItem('latestWatchedVideo')
+          }
+        }
+          // no recently watched video means display unwatched video
+          else if(unwatchedVideos.length > 0){
+            setLatestLearnedVideo(unwatchedVideos[0])
+          }
+          // no unwatched video means display watched video
+          else if(watchedVideos.length > 0){
+            setLatestLearnedVideo(watchedVideos[0])
           }
         } else
           alertMessagePopUp('Some thing went wrong', alertMessageType.DANGER.code);
@@ -168,6 +182,7 @@ export default function Home({ navigation }) {
         <View>
           <Text style={styles.sectionTitle}>Latest Learned</Text>
           <View>
+          {latestLearnedVideo ? (
             <TouchableOpacity
               onPress={() =>
                 openVideo(latestLearnedVideo)
@@ -176,18 +191,19 @@ export default function Home({ navigation }) {
                 <Image
                   style={styles.learnImg}
                   resizeMode="cover"
-                  source={{
-                    uri: latestLearnedVideo.ThumbNail || defualtVideoData.ThumbNail,
-                   
-                  }}
+                  source={
+                    latestLearnedVideo.ThumbNail
+                      ? { uri: latestLearnedVideo.ThumbNail }
+                      : require('../assets/logo/blank.png') // Path to your blank image
+                  }
                   blurRadius={2}
                 />
                 <View style={styles.learnedOverlay}>
                   <Text style={styles.learnedTitle}>
-                   {latestLearnedVideo.VideoTitle || 'Road to Javascript Expert'} 
+                   {latestLearnedVideo.VideoTitle } 
                   </Text>
                   <Text style={styles.learnedSubtitle}>
-                    {latestLearnedVideo.VideoDescription || 'Part 1 • 20 Minutes'}
+                    {latestLearnedVideo.VideoDescription }
                   </Text>
                 </View>
                 <View style={styles.playButton}>
@@ -195,6 +211,9 @@ export default function Home({ navigation }) {
                 </View>
               </View>
             </TouchableOpacity>
+            ) : (
+              <Text style={styles.noDataText}>No videos available</Text> // Show this message if no video is available
+            )}
           </View>
         </View>
       </View>
