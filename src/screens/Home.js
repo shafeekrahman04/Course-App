@@ -200,7 +200,7 @@ export default function Home({ navigation }) {
       </View>
 
       {/* Latest Video */}
-
+{unWatchedVideoData.length > 0 && (
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Latest Video</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -231,7 +231,7 @@ export default function Home({ navigation }) {
           </View>
         </ScrollView>
       </View>
-
+)}
       {/* Watched Video */}
 {watchedVideoData.length > 0 && (
       <View style={styles.section}>
