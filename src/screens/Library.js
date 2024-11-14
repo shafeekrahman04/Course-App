@@ -31,7 +31,7 @@ export default function Library({navigation}) {
   };
 
   const [refreshing, setRefreshing] = useState(false);
-  const [videoData, setVideoData] = useState([defualtVideoData]);
+  const [videoData, setVideoData] = useState();
   const [loader, setLoader] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     message: '',
@@ -97,7 +97,7 @@ export default function Library({navigation}) {
             res.data.map(video => ({
               VideoId: video.VideoId,
               VideoTitle: video.VideoTitle,
-              ThumbNail: video.ThumbNail || defaultThumbnail,
+              ThumbNail: video.ThumbNail ,
               VideoUrl: video.UploadedLocation,
               VideoDescription: video.VideoDescription,
               WatchedStatus: video.WatchedStatus,
