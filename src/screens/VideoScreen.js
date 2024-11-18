@@ -63,7 +63,7 @@ export default function VideoScreen({navigation,route}) {
   const [fullscreen, setFullscreen] = useState(false);
   const [showControl, setShowControl] = useState(true);
 
-  const [recommendedVideo, setRecommendedVideo] = useState([defualtRecommendedVideoData]);
+  const [recommendedVideo, setRecommendedVideo] = useState([]);
 
   const [loader, setLoader] = useState(false); // loader
 
