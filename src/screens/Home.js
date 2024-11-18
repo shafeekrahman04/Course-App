@@ -19,6 +19,7 @@ import { alertMessageType } from '../utilities/enum/Enum';
 import AlertMessage from '../shared/AlertMessage';
 import Loader from '../shared/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function Home({ navigation }) {
   const {user} = useAuth();
@@ -36,6 +37,7 @@ export default function Home({ navigation }) {
   const [watchedVideoData, setWatchedVideoData] = useState([]);
   const [unWatchedVideoData, setUnWatchedVideoData] = useState([]);
   const [latestLearnedVideo, setLatestLearnedVideo] = useState([]);
+  const [latestWatchedVideo, setLatestWatchedVideo] = useState([]);
   const [loader, setLoader] = useState(false);
   const [alertMessage, setAlertMessage] = useState({
     message: '',
@@ -49,9 +51,10 @@ export default function Home({ navigation }) {
     setIsAlertVisible(true);
   };
 
-  const openVideo = item => {
-
+  const openVideo = (item) => {
+  
       navigation.navigate('VideoScreen', { item });
+     
    };
 
   function logoutHandler() {
@@ -101,7 +104,6 @@ export default function Home({ navigation }) {
               WatchedStatus: video.WatchedStatus,
             })),
           );
-          //set recently watched video
           if (parsedLastWatchedVideo) {
             const videoExist = res.data.some(video => video.VideoId === parsedLastWatchedVideo.VideoId);
             if(videoExist){
@@ -110,13 +112,28 @@ export default function Home({ navigation }) {
             AsyncStorage.removeItem('latestWatchedVideo')
           }
         }
-          // no recently watched video means display unwatched video
-          else if(unwatchedVideos.length > 0){
-            setLatestLearnedVideo(unwatchedVideos[0])
-          }
-          // no unwatched video means display watched video
-          else if(watchedVideos.length > 0){
-            setLatestLearnedVideo(watchedVideos[0])
+          //set recently watched video
+          if (watchedVideos.length > 0) {
+            setLatestLearnedVideo({
+              VideoId: watchedVideos[watchedVideos.length - 1].VideoId,
+              VideoTitle: watchedVideos[watchedVideos.length - 1].VideoTitle,
+              ThumbNail: watchedVideos[watchedVideos.length - 1].ThumbNail,
+              VideoUrl: watchedVideos[watchedVideos.length - 1].UploadedLocation,
+              VideoDescription:
+                watchedVideos[watchedVideos.length - 1].VideoDescription,
+              WatchedStatus: watchedVideos[watchedVideos.length - 1].WatchedStatus,
+            });
+          } else if (unwatchedVideos.length > 0) {
+            setLatestLearnedVideo({
+              VideoId: unwatchedVideos[0].VideoId,
+              VideoTitle: unwatchedVideos[0].VideoTitle,
+              ThumbNail: unwatchedVideos[0].ThumbNail,
+              VideoUrl: unwatchedVideos[0].UploadedLocation,
+              VideoDescription: unwatchedVideos[0].VideoDescription,
+              WatchedStatus: unwatchedVideos[0].WatchedStatus,
+            });
+          } else {
+            setLatestLearnedVideo(null);
           }
         } else
           alertMessagePopUp('Some thing went wrong', alertMessageType.DANGER.code);
@@ -129,11 +146,35 @@ export default function Home({ navigation }) {
       console.error(error);
     }
   };
+ 
 
   useEffect(() => {
     getVideoData();
     
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getVideoData();
+      const fetchLatestVideos = async () => {
+        try {
+          const storedLearnedVideo = await AsyncStorage.getItem('latestLearnedVideo');
+          const storedWatchedVideo = await AsyncStorage.getItem('latestWatchedVideo');
+          
+          if (storedLearnedVideo) {
+            setLatestLearnedVideo(JSON.parse(storedLearnedVideo));
+          }
+  
+          if (storedWatchedVideo) {
+            setLatestWatchedVideo(JSON.parse(storedWatchedVideo)); 
+          }
+        } catch (error) {
+          console.error('Error fetching latest videos:', error);
+        }
+      };
+      fetchLatestVideos();
+    }, [])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);
